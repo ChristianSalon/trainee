@@ -8,6 +8,8 @@ import TeamScreen from "../screens/TeamScreen";
 import EventScreen from "../screens/EventScreen";
 import PaymentScreen from "../screens/PaymentScreen";
 import ImageDetailScreen from "../screens/ImageDetailScreen";
+import VideoDetailScreen from "../screens/VideoDetailScreen";
+import AttendanceScreen from "../screens/AttendanceScreen";
 
 export {
   LoginScreen,
@@ -20,4 +22,6 @@ export {
   EventScreen,
   PaymentScreen,
   ImageDetailScreen,
+  VideoDetailScreen,
+  AttendanceScreen,
 };

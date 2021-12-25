@@ -18,6 +18,7 @@ import { db, auth } from "../firebase";
 import { useTeam } from "../hooks";
 import { EventProps } from "../types";
 import { Event } from "../components";
+import firebase from "firebase";
 
 const EventsScreen = () => {
   const [events, setEvents] = useState<{ [key: string]: EventProps[] }>({});
@@ -121,19 +122,17 @@ const EventsScreen = () => {
   };
 
   useEffect(() => {
-    setEvents({});
-    db.collection("events")
+    const unsubscribe = db
+      .collection("events")
       .where("teams", "array-contains", team.id)
       .orderBy("date", "asc")
-      .get()
-      .then((snapshot) => {
-        const mappedData = snapshot.docs.map((doc) => ({
+      .onSnapshot((querySnapshot) => {
+        setEvents({});
+        const mappedData = querySnapshot.docs.map((doc) => ({
           event: doc.data(),
         }));
 
         mappedData.forEach((item) => {
-          console.log(item);
-          //const time = day.timestamp * 24 * 60 * 60 * 1000;
           const strTime = dateToString(item.event.date);
           if (!events[strTime]) {
             events[strTime] = [];
@@ -145,24 +144,17 @@ const EventsScreen = () => {
         Object.keys(events).forEach((key) => {
           newItems[key] = events[key];
         });
+
         setEvents(newItems);
         setIsLoaded(true);
-
-        /*const reducedData = mappedData.reduce(
-          (acc: { [key: string]: EventProps[] }, currentItem) => {
-            const date = dateToString(currentItem.event.date);
-            acc[date] = currentItem.event;
-            return acc;
-          },
-          {}
-        );
-        setEvents(reducedData);*/
       });
+    return () => unsubscribe();
   }, []);
 
   const renderItem = (item) => {
     return <Event event={item.event} />;
   };
+  console.log(dateToString(firebase.firestore.Timestamp.now()));
 
   return (
     <NativeBaseProvider theme={theme}>
@@ -184,13 +176,14 @@ const EventsScreen = () => {
               <Agenda
                 items={events}
                 //loadItemsForMonth={loadEvents}
-                selected={"2021-12-15"}
+                selected={new Date()}
                 renderItem={renderItem}
                 theme={{
                   todayTextColor: theme.colors.darkText,
                   todayBackgroundColor: theme.colors.gray[200],
                   selectedDayBackgroundColor: theme.colors.primary[500], // calendar sel date
                   dotColor: theme.colors.primary[500], // dots
+                  agendaTodayColor: theme.colors.primary[500],
                 }}
               />
             </Box>

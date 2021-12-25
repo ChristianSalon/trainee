@@ -1,13 +1,31 @@
-import React, { useState } from "react";
-import { Box, Button, Image, Pressable } from "native-base";
+import React, { useState, useEffect } from "react";
+import { Box, IconButton, Image, Pressable } from "native-base";
 import { VideoMessageProps } from "../types";
-import { useNavigation } from "@react-navigation/native";
+import { ThemeProvider, useNavigation } from "@react-navigation/native";
 import { Video } from "expo-av";
+import * as VideoThumbnails from "expo-video-thumbnails";
+import { Entypo } from "@expo/vector-icons";
+import { theme } from "../themes";
 
 const SendedVideoMessage: React.FC<VideoMessageProps> = ({ message }) => {
   const navigation = useNavigation();
-  const [status, setStatus] = useState({});
-  const video = React.useRef(null);
+  //const [status, setStatus] = useState({});
+  //const video = React.useRef(null);
+  const [thumbnail, setThumbnail] = useState("");
+
+  useEffect(() => {
+    const generateThumbnail = async () => {
+      try {
+        const { uri } = await VideoThumbnails.getThumbnailAsync(
+          message.content
+        );
+        setThumbnail(uri);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    generateThumbnail();
+  }, []);
 
   return (
     <Box
@@ -24,15 +42,26 @@ const SendedVideoMessage: React.FC<VideoMessageProps> = ({ message }) => {
         },
       }}
     >
-      <Video
-        style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: 12 }}
-        source={{
-          uri: message.content,
-        }}
-        shouldPlay
-        useNativeControls
-        resizeMode="contain"
-      />
+      {thumbnail && (
+        <Box justifyContent="center" alignItems="center">
+          <Image source={{ uri: thumbnail }} size="2xl" rounded="xl" />
+          <Pressable
+            position="absolute"
+            top="0"
+            left="0"
+            bottom="0"
+            right="0"
+            justifyContent="center"
+            alignItems="center"
+            onPress={() =>
+              navigation.navigate("VideoDetail", { uri: message.content })
+            }
+            opacity={0.7}
+          >
+            <Entypo name="controller-play" size={70} color="gray" />
+          </Pressable>
+        </Box>
+      )}
     </Box>
   );
 };

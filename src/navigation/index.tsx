@@ -14,9 +14,12 @@ import {
   EventScreen,
   PaymentScreen,
   ImageDetailScreen,
+  AttendanceScreen,
+  VideoDetailScreen,
 } from "../screens";
 import { theme } from "../themes";
-import { TeamProvider } from "../hooks/useTeam";
+import useTeam, { TeamProvider } from "../hooks/useTeam";
+import { Image, Text, View } from "react-native";
 
 const greenTopbar = {
   headerStyle: { backgroundColor: "#139874" },
@@ -100,12 +103,56 @@ function TeamTabsScreen() {
 
 const HomeStack = createNativeStackNavigator();
 
+const getOptions = () => {
+  const { team } = useTeam();
+  return {
+    headerTitle: team.name,
+    headerLeft: () => (
+      <Image
+        style={{
+          width: 35,
+          height: 35,
+          borderRadius: 35,
+          marginHorizontal: 10,
+        }}
+        source={{
+          uri: team.photoURL,
+        }}
+      />
+    ),
+  };
+};
+
+const HeaderTitle = (allowFontScaling, style, children) => {
+  const { team } = useTeam();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Image
+        style={{
+          width: 35,
+          height: 35,
+          borderRadius: 35,
+          marginRight: 10,
+        }}
+        source={{
+          uri: team.photoURL,
+        }}
+      />
+      <Text style={{ fontSize: 18, fontWeight: "500" }}>{team.name}</Text>
+    </View>
+  );
+};
+
 function HomeStackScreen() {
   return (
     <TeamProvider>
       <HomeStack.Navigator screenOptions={whiteTopbar}>
         <HomeStack.Screen name="Home" component={HomeScreen} />
-        <HomeStack.Screen name="Team" component={TeamTabsScreen} />
+        <HomeStack.Screen
+          name="Team"
+          component={TeamTabsScreen}
+          options={{ headerTitle: (props) => <HeaderTitle {...props} /> }}
+        />
         <HomeStack.Screen name="Profile" component={ProfileScreen} />
       </HomeStack.Navigator>
     </TeamProvider>
@@ -131,6 +178,7 @@ function EventsStackScreen() {
     <EventsStack.Navigator screenOptions={{ headerShown: false }}>
       <EventsStack.Screen name="Events" component={EventsScreen} />
       <EventsStack.Screen name="Event" component={EventScreen} />
+      <EventsStack.Screen name="Attendance" component={AttendanceScreen} />
       <EventsStack.Screen name="Profile" component={ProfileScreen} />
     </EventsStack.Navigator>
   );
@@ -146,6 +194,11 @@ function ChatStackScreen() {
         options={{ headerShown: false }}
         name="ImageDetail"
         component={ImageDetailScreen}
+      />
+      <ChatStack.Screen
+        options={{ headerShown: false }}
+        name="VideoDetail"
+        component={VideoDetailScreen}
       />
     </ChatStack.Navigator>
   );

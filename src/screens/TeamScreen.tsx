@@ -10,6 +10,7 @@ const TeamScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      title: team.name,
       headerRight: () => (
         <TouchableOpacity
           activeOpacity={0.7}

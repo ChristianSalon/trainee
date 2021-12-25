@@ -9,6 +9,7 @@ interface VideoMessageProps {
     id: string;
     name: string;
     photoURL: string;
+    thumbnailURL: string;
     type: string;
   };
 }

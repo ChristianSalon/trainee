@@ -7,6 +7,7 @@ import SendedVideoMessage from "./SendedVideoMessage";
 import ReceivedVideoMessage from "./ReceivedVideoMessage";
 import ChatActionSheet from "./ChatActionSheet";
 import Event from "./Event";
+import Attendance from "./Attendance";
 
 export {
   Team,
@@ -18,4 +19,5 @@ export {
   SendedVideoMessage,
   ReceivedVideoMessage,
   Event,
+  Attendance,
 };

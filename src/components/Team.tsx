@@ -10,24 +10,9 @@ import {
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import { useTeam } from "../hooks";
+import { TeamProps } from "../types";
 
-interface Props {
-  team: {
-    coaches: string[];
-    id: string;
-    lastMessage: string;
-    members: string[];
-    name: string;
-    clubName: string;
-    photoURL: string;
-    updatedAt: {
-      nanoseconds: number;
-      seconds: number;
-    };
-  };
-}
-
-const Team: React.FC<Props> = ({ team }) => {
+const Team: React.FC<TeamProps> = ({ team }) => {
   const navigation = useNavigation();
   const { setTeam } = useTeam();
 

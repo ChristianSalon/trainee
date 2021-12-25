@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar, Box, HStack, Image } from "native-base";
 import { ImageMessageProps } from "../types";
+import { Video } from "expo-av";
 
 const ReceivedImageMessage: React.FC<ImageMessageProps> = ({ message }) => {
   return (
@@ -14,14 +15,14 @@ const ReceivedImageMessage: React.FC<ImageMessageProps> = ({ message }) => {
           color: "darkText",
         }}
       >
-        <Image
+        <Video
+          style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: 12 }}
           source={{
             uri: message.content,
           }}
-          alt="Image Message"
-          size="2xl"
-          resizeMode="cover"
-          rounded="xl"
+          shouldPlay
+          useNativeControls
+          resizeMode="contain"
         />
       </Box>
     </HStack>

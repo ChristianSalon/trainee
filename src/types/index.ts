@@ -4,6 +4,7 @@ import TextMessageProps from "./TextMessageProps";
 import ImageMessageProps from "./ImageMessageProps";
 import VideoMessageProps from "./VideoMessageProps";
 import ActionSheetProps from "./ActionSheetProps";
+import AttendanceProps from "./AttendanceProps";
 
 export {
   TeamProps,
@@ -12,4 +13,5 @@ export {
   ImageMessageProps,
   ActionSheetProps,
   VideoMessageProps,
+  AttendanceProps,
 };
