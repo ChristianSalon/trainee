@@ -5,22 +5,19 @@ import firebase from "firebase";
 
 interface Props {
   attendance: {
-    date: {
-      nanoseconds: number;
-      seconds: number;
-    };
-    id: string;
+    id: number;
+    userId: string;
+    eventId: string;
     isComing: boolean;
+    date: string;
     name: string;
     photoURL: string;
   };
 }
 
 const Attendance: React.FC<Props> = ({ attendance }) => {
-  const timestamp = new firebase.firestore.Timestamp(
-    attendance.date.seconds,
-    attendance.date.nanoseconds
-  );
+  const date = new Date(attendance.date);
+  const timestamp = date.toLocaleString();
 
   return (
     <Box w="100%">
@@ -34,7 +31,7 @@ const Attendance: React.FC<Props> = ({ attendance }) => {
           <Text bold fontSize="md">
             {attendance.name}
           </Text>
-          <Text>{timestamp.toDate().toLocaleString()}</Text>
+          <Text>{timestamp}</Text>
         </VStack>
         <Box position="absolute" right="20px">
           {attendance.isComing ? (

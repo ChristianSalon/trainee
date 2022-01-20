@@ -17,19 +17,28 @@ const Team: React.FC<TeamProps> = ({ team }) => {
   const { setTeam } = useTeam();
 
   const navigateToClub = () => {
-    setTeam(team);
+    setTeam({
+      teamId: team.teamId,
+      name: team.name,
+      photoURL: team.photoURL,
+      clubId: team.clubId,
+    });
     navigation.navigate("Team", { team });
   };
 
   return (
     <Pressable onPress={() => navigateToClub()}>
       {/*<Divider />*/}
-      <Box justifyContent="center" px={4} height="100px">
+      <Box justifyContent="center" py="3" px="20px">
         <HStack alignItems="center" space={4}>
           <Avatar bg="transparent" size="lg" source={{ uri: team.photoURL }} />
-          <VStack>
-            <Text fontSize="lg">{team.clubName}</Text>
-            <Text>{team.name}</Text>
+          <VStack flex="1">
+            <Text fontSize="lg" noOfLines={1} isTruncated>
+              {team.clubName}
+            </Text>
+            <Text noOfLines={2} isTruncated>
+              {team.name}
+            </Text>
           </VStack>
         </HStack>
       </Box>

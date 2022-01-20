@@ -1,7 +1,18 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useLayoutEffect } from "react";
-import { View, Text, TouchableOpacity, Image, Button } from "react-native";
+import {
+  Box,
+  Text,
+  NativeBaseProvider,
+  Heading,
+  HStack,
+  VStack,
+  ScrollView,
+  Divider,
+} from "native-base";
 import { useTeam } from "../hooks";
+import { theme } from "../themes";
+import { StatusBar } from "expo-status-bar";
 
 const TeamScreen = () => {
   const navigation = useNavigation();
@@ -11,37 +22,53 @@ const TeamScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: team.name,
-      headerRight: () => (
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            navigation.navigate("Profile");
-          }}
-        >
-          <Image
-            style={{ width: 35, height: 35, borderRadius: 35 }}
-            source={{
-              uri: "https://firebasestorage.googleapis.com/v0/b/chatee-48122.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=e807cc6f-3d8b-461e-a935-90672c08361f",
-            }}
-          />
-        </TouchableOpacity>
-      ),
     });
   }, []);
 
   return (
-    <View>
-      <Text>Team Screen</Text>
-      <Text>
-        {team.clubName} - {team.name}
-      </Text>
-      <Button
-        title={"Payment"}
-        onPress={() => {
-          navigation.navigate("Payment");
-        }}
-      />
-    </View>
+    <NativeBaseProvider theme={theme}>
+      <StatusBar style={"dark"} />
+      <Box w="full" h="1px" bg="gray.100" />
+      <ScrollView>
+        <VStack p="20px" space="30px">
+          <Box>
+            <Heading size="md" mb="3">
+              Upcomig Events
+            </Heading>
+            <HStack space="3">
+              <Box w="100px" h="200px" bg="amber.500" />
+              <Box w="100px" h="200px" bg="blue.500" />
+              <Box w="100px" h="200px" bg="red.500" />
+            </HStack>
+            {/* Events na 3 dni */}
+          </Box>
+
+          <Box>
+            <Heading size="md" mb="3">
+              Payments
+            </Heading>
+            <HStack space="3">
+              <Box w="100px" h="200px" bg="amber.500" />
+              <Box w="100px" h="200px" bg="blue.500" />
+              <Box w="100px" h="200px" bg="red.500" />
+            </HStack>
+            {/* Events na 3 dni */}
+          </Box>
+
+          <Box>
+            <Heading size="md" mb="3">
+              Messages
+            </Heading>
+            <VStack space="3">
+              <Box w="100%" h="50px" bg="amber.500" />
+              <Box w="100%" h="50px" bg="blue.500" />
+              <Box w="100%" h="50px" bg="red.500" />
+            </VStack>
+            {/* Events na 3 dni */}
+          </Box>
+        </VStack>
+      </ScrollView>
+    </NativeBaseProvider>
   );
 };
 

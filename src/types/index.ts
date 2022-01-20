@@ -6,6 +6,9 @@ import VideoMessageProps from "./VideoMessageProps";
 import ActionSheetProps from "./ActionSheetProps";
 import AttendanceProps from "./AttendanceProps";
 
+import Team from "./Team";
+import Event from "./Event";
+
 export {
   TeamProps,
   EventProps,
@@ -14,4 +17,6 @@ export {
   ActionSheetProps,
   VideoMessageProps,
   AttendanceProps,
+  Team,
+  Event,
 };

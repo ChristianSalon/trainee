@@ -2,6 +2,10 @@ import React from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+  createDrawerNavigator,
+  DrawerItemList,
+} from "@react-navigation/drawer";
 import { Feather } from "@expo/vector-icons";
 import {
   LoginScreen,
@@ -16,10 +20,19 @@ import {
   ImageDetailScreen,
   AttendanceScreen,
   VideoDetailScreen,
+  CreateNewClubScreen,
+  CreateNewTeamScreen,
+  AddNewTeamScreen,
+  AdminPanelClubsScreen,
+  AdminPanelTeamsScreen,
+  EditClubScreen,
+  EditTeamScreen,
+  CreateNewEventScreen,
 } from "../screens";
 import { theme } from "../themes";
 import useTeam, { TeamProvider } from "../hooks/useTeam";
-import { Image, Text, View } from "react-native";
+import { Image, SafeAreaView, Text, View } from "react-native";
+import { auth } from "../firebase";
 
 const greenTopbar = {
   headerStyle: { backgroundColor: "#139874" },
@@ -65,20 +78,6 @@ function TeamTabsScreen() {
       }}
     >
       <TeamTabs.Screen
-        name="Team"
-        component={TeamStackScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Feather
-              containerStyle={{ marginTop: 6 }}
-              name="home"
-              size={22}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <TeamTabs.Screen
         name="Events"
         component={EventsStackScreen}
         options={{
@@ -97,33 +96,49 @@ function TeamTabsScreen() {
           ),
         }}
       />
+      <TeamTabs.Screen
+        name="Payments"
+        component={PaymentStackScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Feather
+              containerStyle={{ marginTop: 6 }}
+              name="dollar-sign"
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <TeamTabs.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+          headerShadowVisible: false,
+          tabBarIcon: ({ color }) => (
+            <Image
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 28,
+                borderColor: color,
+                borderWidth: 1,
+              }}
+              source={{
+                uri: auth.currentUser.photoURL,
+              }}
+            />
+          ),
+        }}
+      />
     </TeamTabs.Navigator>
   );
 }
 
-const HomeStack = createNativeStackNavigator();
+const MainStack = createNativeStackNavigator();
 
-const getOptions = () => {
-  const { team } = useTeam();
-  return {
-    headerTitle: team.name,
-    headerLeft: () => (
-      <Image
-        style={{
-          width: 35,
-          height: 35,
-          borderRadius: 35,
-          marginHorizontal: 10,
-        }}
-        source={{
-          uri: team.photoURL,
-        }}
-      />
-    ),
-  };
-};
-
-const HeaderTitle = (allowFontScaling, style, children) => {
+/*const HeaderTitle = () => {
   const { team } = useTeam();
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -141,33 +156,136 @@ const HeaderTitle = (allowFontScaling, style, children) => {
       <Text style={{ fontSize: 18, fontWeight: "500" }}>{team.name}</Text>
     </View>
   );
-};
+};*/
 
-function HomeStackScreen() {
+function MainStackScreen() {
   return (
     <TeamProvider>
-      <HomeStack.Navigator screenOptions={whiteTopbar}>
-        <HomeStack.Screen name="Home" component={HomeScreen} />
-        <HomeStack.Screen
+      <MainStack.Navigator screenOptions={{ headerShown: false }}>
+        <MainStack.Screen name="Home" component={HomeStackScreen} />
+        <MainStack.Screen
           name="Team"
           component={TeamTabsScreen}
-          options={{ headerTitle: (props) => <HeaderTitle {...props} /> }}
+          //options={{ headerTitle: (props) => <HeaderTitle /> }}
         />
-        <HomeStack.Screen name="Profile" component={ProfileScreen} />
-      </HomeStack.Navigator>
+      </MainStack.Navigator>
     </TeamProvider>
   );
 }
 
-const TeamStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
-function TeamStackScreen() {
+function HomeStackScreen() {
   return (
-    <TeamStack.Navigator screenOptions={{ headerShown: false }}>
-      <TeamStack.Screen name="Team" component={TeamScreen} />
-      <TeamStack.Screen name="Payment" component={PaymentScreen} />
-      <TeamStack.Screen name="Profile" component={ProfileScreen} />
-    </TeamStack.Navigator>
+    <HomeStack.Navigator screenOptions={whiteTopbar}>
+      <HomeStack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen name="Profile" component={ProfileScreen} />
+      <HomeStack.Screen
+        name="Admin Panel"
+        component={AdminDrawerScreen}
+        options={{ headerShown: false }}
+      />
+    </HomeStack.Navigator>
+  );
+}
+
+const AdminDrawer = createDrawerNavigator();
+
+function AdminDrawerScreen() {
+  return (
+    <AdminDrawer.Navigator
+      screenOptions={{
+        headerShadowVisible: false,
+        drawerActiveTintColor: theme.colors.primary[500],
+      }}
+      drawerContent={(props) => {
+        return (
+          <SafeAreaView style={{ flex: 1, paddingTop: 70 }}>
+            <Text
+              style={{
+                paddingBottom: 40,
+                paddingHorizontal: 16,
+                fontSize: 28,
+                fontWeight: "bold",
+                color: theme.colors.gray[700],
+              }}
+            >
+              Admin Panel
+            </Text>
+            <DrawerItemList {...props} />
+          </SafeAreaView>
+        );
+      }}
+    >
+      <AdminDrawer.Screen
+        name="Admin Panel Clubs Screen"
+        component={AdminPanelClubsStackScreen}
+        options={{ title: "My Clubs" }}
+      />
+      <AdminDrawer.Screen
+        name="Admin Panel Teams Screen"
+        component={AdminPanelTeamsStackScreen}
+        options={{ title: "My Teams" }}
+      />
+    </AdminDrawer.Navigator>
+  );
+}
+
+const AdminPanelClubsStack = createNativeStackNavigator();
+
+function AdminPanelClubsStackScreen() {
+  return (
+    <AdminPanelClubsStack.Navigator screenOptions={{ headerShown: false }}>
+      <AdminPanelClubsStack.Screen
+        name="Admin Panel Clubs Screen"
+        component={AdminPanelClubsScreen}
+        options={{ title: "Clubs" }}
+      />
+      <AdminPanelClubsStack.Screen
+        name="Create New Club"
+        component={CreateNewClubScreen}
+      />
+      <AdminPanelClubsStack.Screen
+        name="Edit Club"
+        component={EditClubScreen}
+      />
+    </AdminPanelClubsStack.Navigator>
+  );
+}
+
+const AdminPanelTeamsStack = createNativeStackNavigator();
+
+function AdminPanelTeamsStackScreen() {
+  return (
+    <AdminPanelTeamsStack.Navigator screenOptions={{ headerShown: false }}>
+      <AdminPanelTeamsStack.Screen
+        name="Admin Panel Teams Screen"
+        component={AdminPanelTeamsScreen}
+        options={{ title: "Teams" }}
+      />
+      <AdminPanelTeamsStack.Screen
+        name="Create New Team"
+        component={CreateNewTeamScreen}
+      />
+      <AdminPanelTeamsStack.Screen
+        name="Edit Team"
+        component={EditTeamScreen}
+      />
+    </AdminPanelTeamsStack.Navigator>
+  );
+}
+
+const PaymentStack = createNativeStackNavigator();
+
+function PaymentStackScreen() {
+  return (
+    <PaymentStack.Navigator screenOptions={whiteTopbar}>
+      <PaymentStack.Screen name="Payment" component={PaymentScreen} />
+    </PaymentStack.Navigator>
   );
 }
 
@@ -175,11 +293,22 @@ const EventsStack = createNativeStackNavigator();
 
 function EventsStackScreen() {
   return (
-    <EventsStack.Navigator screenOptions={{ headerShown: false }}>
+    <EventsStack.Navigator screenOptions={whiteTopbar}>
       <EventsStack.Screen name="Events" component={EventsScreen} />
-      <EventsStack.Screen name="Event" component={EventScreen} />
+      <EventsStack.Screen
+        name="Event"
+        component={EventScreen}
+        options={{
+          headerTransparent: true,
+          title: "",
+          headerTintColor: "#fff",
+        }}
+      />
       <EventsStack.Screen name="Attendance" component={AttendanceScreen} />
-      <EventsStack.Screen name="Profile" component={ProfileScreen} />
+      <EventsStack.Screen
+        name="Create New Event"
+        component={CreateNewEventScreen}
+      />
     </EventsStack.Navigator>
   );
 }
@@ -188,15 +317,27 @@ const ChatStack = createNativeStackNavigator();
 
 function ChatStackScreen() {
   return (
-    <ChatStack.Navigator screenOptions={{ headerShown: false }}>
-      <ChatStack.Screen name="Chat" component={ChatScreen} />
+    <ChatStack.Navigator screenOptions={whiteTopbar}>
       <ChatStack.Screen
+        name="Chat"
+        component={ChatScreen}
         options={{ headerShown: false }}
+      />
+      <ChatStack.Screen
+        options={{
+          headerTransparent: true,
+          title: "",
+          headerTintColor: "#fff",
+        }}
         name="ImageDetail"
         component={ImageDetailScreen}
       />
       <ChatStack.Screen
-        options={{ headerShown: false }}
+        options={{
+          headerTransparent: true,
+          title: "",
+          headerTintColor: "#fff",
+        }}
         name="VideoDetail"
         component={VideoDetailScreen}
       />
@@ -214,7 +355,7 @@ function RootStackScreen() {
       }}
     >
       <RootStack.Screen name="Auth" component={AuthStackScreen} />
-      <RootStack.Screen name="Home" component={HomeStackScreen} />
+      <RootStack.Screen name="Home" component={MainStackScreen} />
     </RootStack.Navigator>
   );
 }

@@ -3,8 +3,8 @@
     "name": "Trainee",
     "slug": "Trainee",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "orientation": "default",
+    "icon": "./src/assets/logo.png",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -15,11 +15,15 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.christiansalon.trainee",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.christiansalon.trainee",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#FFFFFF"
       }
     },

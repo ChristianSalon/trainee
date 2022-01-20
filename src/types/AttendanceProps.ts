@@ -1,12 +1,11 @@
 interface AttendanceProps {
   attendance: [
     {
-      date: {
-        nanoseconds: number;
-        seconds: number;
-      };
-      id: string;
+      id: number;
+      userId: string;
+      eventId: string;
       isComing: boolean;
+      date: string;
       name: string;
       photoURL: string;
     }

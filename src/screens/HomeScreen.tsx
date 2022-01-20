@@ -1,36 +1,28 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { db, auth } from "../firebase";
-import { NativeBaseProvider, FlatList, Fab, Icon } from "native-base";
+import {
+  NativeBaseProvider,
+  FlatList,
+  Fab,
+  Icon,
+  Heading,
+  Box,
+  Image,
+  HStack,
+  Pressable,
+  Avatar,
+} from "native-base";
 import { theme } from "../themes";
 import { Team } from "../components";
-import { AntDesign } from "@expo/vector-icons";
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import axios from "axios";
 
 const HomeScreen = ({ navigation }) => {
   const [teams, setTeams] = useState([]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            navigation.navigate("Profile");
-          }}
-        >
-          <Image
-            style={{ width: 35, height: 35, borderRadius: 35 }}
-            source={{
-              uri: "https://firebasestorage.googleapis.com/v0/b/chatee-48122.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=e807cc6f-3d8b-461e-a935-90672c08361f",
-            }}
-          />
-        </TouchableOpacity>
-      ),
-    });
-  }, []);
-
-  useEffect(() => {
+  /*useEffect(() => {
     db.collection("teams")
       .where("members", "array-contains", auth.currentUser.uid)
       .orderBy("name", "asc")
@@ -42,21 +34,52 @@ const HomeScreen = ({ navigation }) => {
           }))
         );
       });
+  }, []);*/
+
+  useEffect(() => {
+    const getTeams = async () => {
+      const results = await axios.get(
+        `http://192.168.0.105:3000/teams/${auth.currentUser.uid}`
+      );
+      setTeams(results.data);
+    };
+    getTeams();
+    return () => {
+      getTeams;
+    };
   }, []);
 
   return (
     <NativeBaseProvider theme={theme}>
       <StatusBar style={"dark"} />
-      <FlatList
-        data={teams}
-        renderItem={({ item }) => <Team team={item.data} />}
-        keyExtractor={(item) => item.data.id}
-      />
-      <Fab
-        position="absolute"
-        size="sm"
-        icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
-      />
+      <Box flex="1" safeAreaTop>
+        <HStack
+          px="20px"
+          pt="20px"
+          pb="10px"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Heading>Your Teams</Heading>
+          <Pressable onPress={() => navigation.navigate("Profile")}>
+            <Avatar
+              size="sm"
+              source={{
+                uri: auth.currentUser.photoURL,
+              }}
+            />
+          </Pressable>
+        </HStack>
+        <FlatList
+          data={teams}
+          renderItem={({ item }) => <Team team={item} />}
+          keyExtractor={(item) => item.teamId}
+        />
+        <Fab
+          icon={<Icon color="white" as={<Feather name="edit-3" />} size="sm" />}
+          onPress={() => navigation.navigate("Admin Panel")}
+        />
+      </Box>
     </NativeBaseProvider>
   );
 };

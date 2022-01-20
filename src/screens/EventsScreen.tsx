@@ -1,160 +1,58 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Button,
   Center,
+  Fab,
+  Icon,
   NativeBaseProvider,
   PresenceTransition,
-  Pressable,
   Skeleton,
-  Stack,
   VStack,
+  Text,
+  Heading,
 } from "native-base";
-import { Text } from "react-native";
 import { Agenda } from "react-native-calendars";
 import { theme } from "../themes";
-import { useNavigation } from "@react-navigation/native";
-import { db, auth } from "../firebase";
 import { useTeam } from "../hooks";
-import { EventProps } from "../types";
-import { Event } from "../components";
-import firebase from "firebase";
+import { Event } from "../types";
+import { Event as EventComponent } from "../components";
+import axios from "axios";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const EventsScreen = () => {
-  const [events, setEvents] = useState<{ [key: string]: EventProps[] }>({});
-  const [items, setItems] = useState({});
+  const navigation = useNavigation();
+  const [events, setEvents] = useState<{ [key: string]: Event[] }>({});
   const [isLoaded, setIsLoaded] = useState(false);
   const { team } = useTeam();
 
-  const timeToString = (time) => {
-    const date = new Date(time);
-    return date.toISOString().split("T")[0];
-  };
-
-  const loadItems = (day) => {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-        if (!items[strTime]) {
-          items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            items[strTime].push({
-              name: "Item for " + strTime + " #" + j,
-              height: Math.max(50, Math.floor(Math.random() * 150)),
-            });
-          }
-        }
-      }
-      const newItems = {};
-      Object.keys(items).forEach((key) => {
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 1000);
-  };
-
-  const renderItems = (item) => {
-    return (
-      <Pressable
-        style={{
-          backgroundColor: "white",
-          flex: 1,
-          borderRadius: 5,
-          padding: 10,
-          marginRight: 10,
-          marginTop: 17,
-          width: "100%",
-          height: item.height,
-        }}
-        onPress={() => alert(item.name)}
-      >
-        <Text>{item.name}</Text>
-      </Pressable>
+  const getEvents = async () => {
+    const results = await axios.get(
+      `http://192.168.0.105:3000/events/${team.teamId}`
     );
-  };
+    let events: { [key: string]: Event[] } = {};
+    results.data.forEach((item: Event) => {
+      const strTime = item.startDate.split("T")[0];
+      if (!events[strTime]) {
+        events[strTime] = [];
+      }
+      events[strTime].push(item);
+    });
 
-  const dateToString = (time) => {
-    const date = time.toDate();
-    return date.toISOString().split("T")[0];
-  };
-
-  const loadEvents = (day) => {
-    console.log(day);
-    setEvents({});
-    db.collection("events")
-      .where("teams", "array-contains", team.id)
-      .orderBy("date", "asc")
-      .get()
-      .then((snapshot) => {
-        const mappedData = snapshot.docs.map((doc) => ({
-          event: doc.data(),
-        }));
-
-        mappedData.forEach((item) => {
-          console.log(item);
-          //const time = day.timestamp * 24 * 60 * 60 * 1000;
-          const strTime = dateToString(item.event.date);
-          if (!events[strTime]) {
-            events[strTime] = [];
-          }
-          events[strTime].push(item);
-        });
-
-        const newItems = {};
-        Object.keys(events).forEach((key) => {
-          newItems[key] = events[key];
-        });
-        setEvents(newItems);
-        console.log(events);
-
-        /*const reducedData = mappedData.reduce(
-          (acc: { [key: string]: EventProps[] }, currentItem) => {
-            const date = dateToString(currentItem.event.date);
-            acc[date] = currentItem.event;
-            return acc;
-          },
-          {}
-        );
-        setEvents(reducedData);*/
-      });
+    setEvents(events);
+    setIsLoaded(true);
   };
 
   useEffect(() => {
-    const unsubscribe = db
-      .collection("events")
-      .where("teams", "array-contains", team.id)
-      .orderBy("date", "asc")
-      .onSnapshot((querySnapshot) => {
-        setEvents({});
-        const mappedData = querySnapshot.docs.map((doc) => ({
-          event: doc.data(),
-        }));
-
-        mappedData.forEach((item) => {
-          const strTime = dateToString(item.event.date);
-          if (!events[strTime]) {
-            events[strTime] = [];
-          }
-          events[strTime].push(item);
-        });
-
-        const newItems = {};
-        Object.keys(events).forEach((key) => {
-          newItems[key] = events[key];
-        });
-
-        setEvents(newItems);
-        setIsLoaded(true);
-      });
-    return () => unsubscribe();
+    getEvents();
+    return () => {
+      getEvents;
+    };
   }, []);
 
-  const renderItem = (item) => {
-    return <Event event={item.event} />;
+  const renderItem = (item: Event) => {
+    return <EventComponent event={item} />;
   };
-  console.log(dateToString(firebase.firestore.Timestamp.now()));
 
   return (
     <NativeBaseProvider theme={theme}>
@@ -175,7 +73,7 @@ const EventsScreen = () => {
             <Box w="100%" h="100%">
               <Agenda
                 items={events}
-                //loadItemsForMonth={loadEvents}
+                loadItemsForMonth={getEvents}
                 selected={new Date()}
                 renderItem={renderItem}
                 theme={{
@@ -185,6 +83,16 @@ const EventsScreen = () => {
                   dotColor: theme.colors.primary[500], // dots
                   agendaTodayColor: theme.colors.primary[500],
                 }}
+              />
+              <Fab
+                icon={
+                  <Icon
+                    color="white"
+                    as={<AntDesign name="plus" />}
+                    size="sm"
+                  />
+                }
+                onPress={() => navigation.navigate("Create New Event")}
               />
             </Box>
           </PresenceTransition>

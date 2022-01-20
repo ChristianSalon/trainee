@@ -1,16 +1,10 @@
 interface TeamProps {
   team: {
-    coaches: string[];
-    id: string;
-    lastMessage: string;
-    members: string[];
+    teamId: string;
     name: string;
-    clubName: string;
     photoURL: string;
-    updatedAt: {
-      nanoseconds: number;
-      seconds: number;
-    };
+    clubId: string;
+    clubName: string;
   };
 }
 

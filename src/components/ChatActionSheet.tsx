@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 import firebase from "firebase";
 import useTeam from "../hooks/useTeam";
+import { Audio } from "expo-av";
 
 const ChatActionSheet: React.FC<ActionSheetProps> = ({
   isOpen,
@@ -14,6 +15,7 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
   onClose,
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [recording, setRecording] = useState<{} | undefined>(undefined);
   const { team } = useTeam();
   const signedInUser = auth.currentUser;
 
@@ -135,8 +137,75 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
     });
   };
 
+  const recordAudio = async () => {
+    try {
+      console.log("Requesting permissions..");
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      console.log("Starting recording..");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  };
+
+  const stopRecording = async () => {
+    console.log("Stopping recording..");
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    const uri = recording.getURI();
+    console.log("Recording stopped and stored at", uri);
+
+    setUploading(true);
+
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const docRef = db
+      .collection("teams")
+      .doc(team.id)
+      .collection("messages")
+      .doc();
+
+    const ref = storage.ref().child(team.id + "/audio/" + docRef.id);
+    await ref.put(blob);
+    blob.close();
+
+    ref.getDownloadURL().then((url) => {
+      docRef.set({
+        id: docRef.id,
+        content: url,
+        creatorId: auth.currentUser.uid,
+        name: signedInUser.displayName,
+        photoURL: signedInUser.photoURL,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        type: "AUDIOMESSAGE",
+      });
+      setUploading(false);
+      onClose();
+    });
+  };
+
   return (
-    <Actionsheet disableOverlay={true} isOpen={isOpen} onClose={onClose}>
+    <Actionsheet disableOverlay={false} isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
         {uploading && <Spinner color="primary.500" size="lg" />}
         <Actionsheet.Item
@@ -155,14 +224,32 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         >
           Video
         </Actionsheet.Item>
-        <Actionsheet.Item
-          startIcon={
-            <Icon as={Feather} color="gray.400" mr="2" size="5" name="mic" />
-          }
-          onPress={() => console.log("Audio")}
-        >
-          Audio
-        </Actionsheet.Item>
+        {recording === undefined ? (
+          <Actionsheet.Item
+            startIcon={
+              <Icon as={Feather} color="gray.400" mr="2" size="5" name="mic" />
+            }
+            onPress={recordAudio}
+          >
+            Audio
+          </Actionsheet.Item>
+        ) : (
+          <Actionsheet.Item
+            startIcon={
+              <Icon
+                as={Feather}
+                color="red.600"
+                mr="2"
+                size="5"
+                name="stop-circle"
+              />
+            }
+            onPress={stopRecording}
+            _text={{ color: "red.600" }}
+          >
+            Stop Recording
+          </Actionsheet.Item>
+        )}
       </Actionsheet.Content>
     </Actionsheet>
   );

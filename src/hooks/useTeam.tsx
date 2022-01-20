@@ -1,10 +1,21 @@
 import React, { createContext, useContext, useState } from "react";
-import { TeamProps } from "../types";
+import { Team } from "../types";
 
-const TeamContext = createContext({});
+interface Props {
+  team: Team;
+  setTeam: React.Dispatch<React.SetStateAction<Team>>;
+}
 
-export const TeamProvider = ({ children }: any) => {
-  const [team, setTeam] = useState<TeamProps | null>(null);
+const TeamContext = createContext<Props>({} as any);
+
+export const TeamProvider: React.FC<React.ReactNode> = ({ children }) => {
+  const [team, setTeam] = useState<Team>({
+    teamId: "null",
+    name: "null",
+    photoURL: "null",
+    clubId: "null",
+  });
+
   return (
     <TeamContext.Provider value={{ team, setTeam }}>
       {children}

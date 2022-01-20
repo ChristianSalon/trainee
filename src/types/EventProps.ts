@@ -1,30 +1,14 @@
 interface EventProps {
   event: {
-    attendance: [
-      {
-        date: {
-          nanoseconds: number;
-          seconds: number;
-        };
-        id: string;
-        isComing: boolean;
-        name: string;
-        photoURL: string;
-      }
-    ];
-    attendanceNumber: number;
-    date: {
-      nanoseconds: number;
-      seconds: number;
-    };
-    details?: string;
-    endTime: string;
-    id: string;
-    location: string;
+    eventId: string;
     name: string;
+    details: string | null;
+    attendanceNumber: number;
+    location: string;
     startTime: string;
-    teams: string[];
-    teamNames: string;
+    endTime: string;
+    startDate: string;
+    endDate: string;
   };
 }
 

@@ -17,7 +17,8 @@ const SendedVideoMessage: React.FC<VideoMessageProps> = ({ message }) => {
     const generateThumbnail = async () => {
       try {
         const { uri } = await VideoThumbnails.getThumbnailAsync(
-          message.content
+          //message.content
+          "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/aQtYSI4Xr16ypOGBzeYH%2Fvideos%2Ffile_example_MP4_480_1_5MG.mp4?alt=media&token=8f665c8d-34b1-4cef-9d77-eb3b49739125"
         );
         setThumbnail(uri);
       } catch (e) {
