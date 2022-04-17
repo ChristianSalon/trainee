@@ -10,19 +10,25 @@ import {
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import { useTeam } from "../hooks";
-import { TeamProps } from "../types";
+import { Roles, TeamProps } from "../types";
+import axios from "axios";
+import { auth } from "../firebase";
 
 const Team: React.FC<TeamProps> = ({ team }) => {
   const navigation = useNavigation();
-  const { setTeam } = useTeam();
+  const { setTeam, setRoles } = useTeam();
 
-  const navigateToClub = () => {
+  const navigateToClub = async () => {
     setTeam({
       teamId: team.teamId,
       name: team.name,
       photoURL: team.photoURL,
       clubId: team.clubId,
     });
+    const results = await axios.get(
+      `http://192.168.0.105:3000/roles/team/${team.teamId}/user/${auth.currentUser.uid}`
+    );
+    setRoles(results.data);
     navigation.navigate("Team", { team });
   };
 

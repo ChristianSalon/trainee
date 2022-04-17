@@ -27,11 +27,13 @@ const Attendance: React.FC<Props> = ({ attendance }) => {
           bg="transparent"
           source={{ uri: attendance.photoURL }}
         />
-        <VStack space="1" justifyContent="center">
-          <Text bold fontSize="md">
+        <VStack justifyContent="center">
+          <Text fontSize="md" noOfLines={2} isTruncated>
             {attendance.name}
           </Text>
-          <Text>{timestamp}</Text>
+          <Text fontSize="sm" color="gray.500" noOfLines={2} isTruncated>
+            {timestamp}
+          </Text>
         </VStack>
         <Box position="absolute" right="20px">
           {attendance.isComing ? (

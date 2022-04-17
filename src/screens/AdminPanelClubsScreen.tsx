@@ -13,17 +13,20 @@ import { theme } from "../themes";
 import { Club } from "../components/AdminPanel";
 import { auth } from "../firebase";
 import { AntDesign } from "@expo/vector-icons";
+import { RefreshControl } from "react-native";
 
 const AdminPanelClubsScreen = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
   const [clubs, setClubs] = useState([]);
 
+  const getClubs = async () => {
+    const response = await axios.get(
+      `http://192.168.0.105:3000/admin/clubs/${auth.currentUser.uid}`
+    );
+    setClubs(response.data);
+  };
+
   useEffect(() => {
-    const getClubs = async () => {
-      const response = await axios.get(
-        `http://192.168.0.105:3000/admin/clubs/${auth.currentUser.uid}`
-      );
-      setClubs(response.data);
-    };
     getClubs();
     return () => {
       getClubs;
@@ -51,6 +54,9 @@ const AdminPanelClubsScreen = ({ navigation }) => {
         data={clubs}
         renderItem={({ item }) => <Club club={item} />}
         keyExtractor={(item) => item.club_id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={getClubs} />
+        }
       />
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}

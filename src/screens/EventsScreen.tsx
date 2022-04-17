@@ -24,7 +24,7 @@ const EventsScreen = () => {
   const navigation = useNavigation();
   const [events, setEvents] = useState<{ [key: string]: Event[] }>({});
   const [isLoaded, setIsLoaded] = useState(false);
-  const { team } = useTeam();
+  const { team, roles } = useTeam();
 
   const getEvents = async () => {
     const results = await axios.get(
@@ -84,16 +84,18 @@ const EventsScreen = () => {
                   agendaTodayColor: theme.colors.primary[500],
                 }}
               />
-              <Fab
-                icon={
-                  <Icon
-                    color="white"
-                    as={<AntDesign name="plus" />}
-                    size="sm"
-                  />
-                }
-                onPress={() => navigation.navigate("Create New Event")}
-              />
+              {(roles.isCoach || roles.isManager) && (
+                <Fab
+                  icon={
+                    <Icon
+                      color="white"
+                      as={<AntDesign name="plus" />}
+                      size="sm"
+                    />
+                  }
+                  onPress={() => navigation.navigate("Create New Event")}
+                />
+              )}
             </Box>
           </PresenceTransition>
         </>

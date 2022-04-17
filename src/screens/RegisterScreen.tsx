@@ -11,12 +11,15 @@ import {
   VStack,
   useToast,
   Icon,
+  Alert,
+  HStack,
 } from "native-base";
 import { StatusBar } from "expo-status-bar";
 import { MaterialIcons } from "@expo/vector-icons";
 import { auth } from "../firebase";
 import { theme } from "../themes";
 import { Platform } from "react-native";
+import axios from "axios";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -30,11 +33,16 @@ const RegisterScreen = ({ navigation }) => {
       .then((authUser) => {
         authUser.user.updateProfile({
           displayName: name,
-          photoURL: null,
+          photoURL:
+            "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
         });
         authUser.user.sendEmailVerification();
-        auth.signOut().then(() => {
-          navigation.goBack();
+        axios.post(`http://192.168.0.105:3000/users`, {
+          userId: authUser.user.uid,
+          name: name,
+          photoURL:
+            "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
+          email: email,
         });
       })
       .catch((error) => alert(error.message));

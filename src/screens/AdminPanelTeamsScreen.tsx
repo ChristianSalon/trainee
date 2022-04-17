@@ -13,17 +13,20 @@ import { theme } from "../themes";
 import { auth } from "../firebase";
 import { AntDesign } from "@expo/vector-icons";
 import { Team } from "../components/AdminPanel";
+import { RefreshControl } from "react-native";
 
 const AdminPanelTeamsScreen = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
   const [teams, setTeams] = useState([]);
 
+  const getTeams = async () => {
+    const response = await axios.get(
+      `http://192.168.0.105:3000/admin/teams/${auth.currentUser.uid}`
+    );
+    setTeams(response.data);
+  };
+
   useEffect(() => {
-    const getTeams = async () => {
-      const response = await axios.get(
-        `http://192.168.0.105:3000/admin/teams/${auth.currentUser.uid}`
-      );
-      setTeams(response.data);
-    };
     getTeams();
     return () => {
       getTeams;
@@ -51,6 +54,9 @@ const AdminPanelTeamsScreen = ({ navigation }) => {
         data={teams}
         renderItem={({ item }) => <Team team={item} />}
         keyExtractor={(item) => item.team_id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={getTeams} />
+        }
       />
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}

@@ -16,7 +16,7 @@ const SendedTextMessage: React.FC<TextMessageProps> = ({ message }) => {
       mx="2"
       my="1"
       maxWidth="70%"
-      rounded="xl"
+      rounded="2xl"
       alignSelf="flex-end"
       _text={{
         color: "lightText",

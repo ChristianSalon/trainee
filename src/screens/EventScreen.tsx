@@ -34,10 +34,10 @@ const EventScreen = ({ route }) => {
   );
   let margin = 0;
 
-  /*auth.currentUser.updateProfile({
+  auth.currentUser.updateProfile({
     photoURL:
-      "https://www.finreport.sk/userfiles/obrazok_clanok_article_detail4c607557740111d9a014322771140b9a.jpg",
-  });*/
+      "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2FHZVm04WIs4aVriRAQBbeKDhnYGI2?alt=media&token=225fb258-b933-43ad-9fc5-da41605ce921",
+  });
 
   useEffect(() => {
     const getAttendance = async () => {

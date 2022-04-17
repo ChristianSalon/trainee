@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   NativeBaseProvider,
   Button,
@@ -8,6 +8,8 @@ import {
   Avatar,
   Pressable,
   HStack,
+  Divider,
+  Heading,
 } from "native-base";
 import { theme } from "../themes";
 import { Feather } from "@expo/vector-icons";
@@ -19,6 +21,9 @@ import firebase from "firebase";
 
 const ProfileScreen = ({ navigation }) => {
   const signedInUser = auth.currentUser;
+  const [selectedPhotoURI, setSelectedPhotoURI] = useState(
+    signedInUser.photoURL
+  );
 
   const logout = () => {
     auth.signOut().then(() => {
@@ -70,7 +75,7 @@ const ProfileScreen = ({ navigation }) => {
       auth.currentUser.updateProfile({
         photoURL: url,
       });
-      //setUploading(false);
+      setSelectedPhotoURI(url);
     });
   };
 
@@ -82,8 +87,9 @@ const ProfileScreen = ({ navigation }) => {
             <Avatar
               size="xl"
               source={{
-                uri: signedInUser.photoURL,
+                uri: selectedPhotoURI,
               }}
+              key={selectedPhotoURI}
             />
             <Button
               variant="subtle"
@@ -102,10 +108,10 @@ const ProfileScreen = ({ navigation }) => {
             onPress={() => console.log("Click")}
           />
           <SettingsOption
-            icon={<Feather name="droplet" size={24} color="black" />}
-            placeholder="Theme"
-            value="Light"
-            onPress={() => console.log("Click")}
+            icon={<Feather name="mail" size={24} color="black" />}
+            placeholder="Show join requests"
+            value="Requests"
+            onPress={() => navigation.navigate("Requests")}
           />
           <SettingsOption
             icon={<Feather name="credit-card" size={24} color="black" />}
@@ -113,6 +119,14 @@ const ProfileScreen = ({ navigation }) => {
             value="4401 **** ****"
             onPress={() => console.log("Click")}
           />
+          <Divider />
+          <SettingsOption
+            icon={<Feather name="droplet" size={24} color="black" />}
+            placeholder="Theme"
+            value="Light"
+            onPress={() => console.log("Click")}
+          />
+          <Divider />
           <SettingsOption
             icon={<Feather name="log-out" size={24} color="black" />}
             value="Logout"

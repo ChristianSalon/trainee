@@ -28,6 +28,12 @@ import {
   EditClubScreen,
   EditTeamScreen,
   CreateNewEventScreen,
+  ManageUsersScreen,
+  AddNewUsersScreen,
+  RequestsScreen,
+  AdminPanelPaymentsScreen,
+  CreateNewPaymentScreen,
+  EditPaymentScreen,
 } from "../screens";
 import { theme } from "../themes";
 import useTeam, { TeamProvider } from "../hooks/useTeam";
@@ -110,28 +116,6 @@ function TeamTabsScreen() {
           ),
         }}
       />
-      <TeamTabs.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          headerShown: true,
-          headerShadowVisible: false,
-          tabBarIcon: ({ color }) => (
-            <Image
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 28,
-                borderColor: color,
-                borderWidth: 1,
-              }}
-              source={{
-                uri: auth.currentUser.photoURL,
-              }}
-            />
-          ),
-        }}
-      />
     </TeamTabs.Navigator>
   );
 }
@@ -184,6 +168,7 @@ function HomeStackScreen() {
         options={{ headerShown: false }}
       />
       <HomeStack.Screen name="Profile" component={ProfileScreen} />
+      <HomeStack.Screen name="Requests" component={RequestsScreen} />
       <HomeStack.Screen
         name="Admin Panel"
         component={AdminDrawerScreen}
@@ -231,6 +216,11 @@ function AdminDrawerScreen() {
         component={AdminPanelTeamsStackScreen}
         options={{ title: "My Teams" }}
       />
+      <AdminDrawer.Screen
+        name="Admin Panel Payments Screen"
+        component={AdminPanelPaymentsStackScreen}
+        options={{ title: "Payments" }}
+      />
     </AdminDrawer.Navigator>
   );
 }
@@ -257,6 +247,17 @@ function AdminPanelClubsStackScreen() {
   );
 }
 
+const EditTeamStack = createNativeStackNavigator();
+
+function EditTeamStackScreen() {
+  return (
+    <EditTeamStack.Navigator screenOptions={{ headerShown: false }}>
+      <EditTeamStack.Screen name="Edit Team" component={EditTeamScreen} />
+      <EditTeamStack.Screen name="Manage Users" component={ManageUsersScreen} />
+    </EditTeamStack.Navigator>
+  );
+}
+
 const AdminPanelTeamsStack = createNativeStackNavigator();
 
 function AdminPanelTeamsStackScreen() {
@@ -275,7 +276,37 @@ function AdminPanelTeamsStackScreen() {
         name="Edit Team"
         component={EditTeamScreen}
       />
+      <AdminPanelTeamsStack.Screen
+        name="Manage Users"
+        component={ManageUsersScreen}
+      />
+      <AdminPanelTeamsStack.Screen
+        name="Add New Users"
+        component={AddNewUsersScreen}
+      />
     </AdminPanelTeamsStack.Navigator>
+  );
+}
+
+const AdminPanelPaymentsStack = createNativeStackNavigator();
+
+function AdminPanelPaymentsStackScreen() {
+  return (
+    <AdminPanelPaymentsStack.Navigator screenOptions={{ headerShown: false }}>
+      <AdminPanelPaymentsStack.Screen
+        name="Admin Panel Payments Screen"
+        component={AdminPanelPaymentsScreen}
+        options={{ title: "Payments" }}
+      />
+      <AdminPanelPaymentsStack.Screen
+        name="Create New Payment"
+        component={CreateNewPaymentScreen}
+      />
+      <AdminPanelPaymentsStack.Screen
+        name="Edit Payment"
+        component={EditPaymentScreen}
+      />
+    </AdminPanelPaymentsStack.Navigator>
   );
 }
 

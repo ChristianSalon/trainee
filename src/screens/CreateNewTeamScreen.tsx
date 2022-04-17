@@ -9,7 +9,7 @@ import {
   Button,
   Input,
   Select,
-  CheckIcon,
+  Image,
 } from "native-base";
 import { theme } from "../themes";
 import * as ImagePicker from "expo-image-picker";
@@ -19,7 +19,9 @@ import axios from "axios";
 
 const CreateNewTeamScreen = ({ navigation }) => {
   const [clubs, setClubs] = useState([]);
-  const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
+  const [selectedPhotoURI, setSelectedPhotoURI] = useState(
+    "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229"
+  );
   const [teamName, setTeamName] = useState("");
   const [clubId, setClubId] = useState("");
   const signedInUser = auth.currentUser;
@@ -94,28 +96,24 @@ const CreateNewTeamScreen = ({ navigation }) => {
       return;
     }
 
-    console.log(result);
+    console.log(result.uri);
     setSelectedPhotoURI(result.uri);
-    console.log(selectedPhotoURI);
   };
+
+  useEffect(() => {
+    console.log(selectedPhotoURI.length);
+  }, [selectedPhotoURI]);
 
   return (
     <NativeBaseProvider theme={theme}>
       <Box w="full" flex="1" alignItems="center" p="20px">
         <VStack space="2" alignItems="center" mb="7">
-          {selectedPhotoURI.length > 0 ? (
-            <Avatar
-              bg="transparent"
-              size="xl"
-              source={{ uri: selectedPhotoURI }}
-            />
-          ) : (
-            <Avatar
-              bg="transparent"
-              size="xl"
-              source={require("../assets/default_photo.png")}
-            />
-          )}
+          <Avatar
+            bg="transparent"
+            size="xl"
+            source={{ uri: selectedPhotoURI }}
+            key={selectedPhotoURI}
+          />
           <Button
             variant="subtle"
             colorScheme="coolGray"

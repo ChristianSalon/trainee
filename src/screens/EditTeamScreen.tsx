@@ -174,6 +174,13 @@ const EditTeamScreen = ({ route }) => {
             })}
           </Select>
           <Box flex="1" />
+          <Button
+            variant="outline"
+            w="full"
+            onPress={() => navigation.navigate("Manage Users", { team })}
+          >
+            Manage Users
+          </Button>
           <Button variant="solid" colorScheme="primary" w="full" onPress={save}>
             Save
           </Button>

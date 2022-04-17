@@ -10,7 +10,7 @@ const ReceivedTextMessage: React.FC<TextMessageProps> = ({ message }) => {
         bg="gray.200"
         p="3"
         maxWidth="70%"
-        rounded="xl"
+        rounded="2xl"
         _text={{
           color: "darkText",
         }}

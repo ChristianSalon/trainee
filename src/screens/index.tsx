@@ -13,11 +13,17 @@ import AttendanceScreen from "../screens/AttendanceScreen";
 import CreateNewClubScreen from "../screens/CreateNewClubScreen";
 import CreateNewTeamScreen from "../screens/CreateNewTeamScreen";
 import CreateNewEventScreen from "../screens/CreateNewEventScreen";
+import CreateNewPaymentScreen from "../screens/CreateNewPaymentScreen";
 import EditClubScreen from "../screens/EditClubScreen";
 import EditTeamScreen from "../screens/EditTeamScreen";
+import EditPaymentScreen from "../screens/EditPaymentScreen";
 import AddNewTeamScreen from "../screens/AddNewTeamScreen";
 import AdminPanelClubsScreen from "../screens/AdminPanelClubsScreen";
 import AdminPanelTeamsScreen from "../screens/AdminPanelTeamsScreen";
+import AdminPanelPaymentsScreen from "../screens/AdminPanelPaymentsScreen";
+import ManageUsersScreen from "../screens/ManageUsersScreen";
+import AddNewUsersScreen from "../screens/AddNewUsersScreen";
+import RequestsScreen from "../screens/RequestsScreen";
 
 export {
   LoginScreen,
@@ -35,9 +41,15 @@ export {
   CreateNewClubScreen,
   CreateNewTeamScreen,
   CreateNewEventScreen,
+  CreateNewPaymentScreen,
   EditClubScreen,
   EditTeamScreen,
+  EditPaymentScreen,
   AddNewTeamScreen,
   AdminPanelClubsScreen,
   AdminPanelTeamsScreen,
+  AdminPanelPaymentsScreen,
+  ManageUsersScreen,
+  AddNewUsersScreen,
+  RequestsScreen,
 };

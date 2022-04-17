@@ -4,6 +4,7 @@ create table clubs (
   `clubId` varchar(50) not null,
   `name` text not null,
   `photoURL` text not null,
+  -- IBAN
   primary key (`clubId`)
 );
 
@@ -21,7 +22,7 @@ create table users (
 );
 
 insert into users (`userId`, `name`, `photoURL`, `email`) values
-	("HZVm04WIs4aVriRAQBbeKDhnYGI2", "Christian Saloň", "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2FHZVm04WIs4aVriRAQBbeKDhnYGI2?alt=media&token=78202c1a-3fd6-4ed4-b63d-03d251099848", "chsalon02@gmail.com");
+	("HZVm04WIs4aVriRAQBbeKDhnYGI2", "Christian Saloň", "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2FHZVm04WIs4aVriRAQBbeKDhnYGI2?alt=media&token=225fb258-b933-43ad-9fc5-da41605ce921", "chsalon02@gmail.com");
 
 create table clubs_users (
   `id` int not null auto_increment,
@@ -116,6 +117,56 @@ INSERT INTO events_teams (`teamId`, `eventId`) VALUES
 	("aQtYSI4Xr16ypOGBzeYH", "2NV5eAI2Ozf1PF7WZmLm"),
 	("aQtYSI4Xr16ypOGBzeYH", "4Wc9Qi9qJkz5z9kURGZk"),
 	("TWsAkjtqo9GqGtudyL5M", "4Wc9Qi9qJkz5z9kURGZk");
+    
+create table requests (
+  `id` int not null auto_increment,
+  `teamId` varchar(50) not null,
+  `userId` varchar(50) not null,
+  `role` text not null,
+  `date` datetime not null,
+  primary key (`id`),
+  foreign key (`teamId`) references teams(`teamId`),
+  foreign key (`userId`) references users(`userId`)
+);
+
+create table payments (
+  `paymentId` int not null auto_increment,
+  `name` text not null,
+  `details` text,
+  `amount` decimal(7, 2) not null,
+  `createdAt` date not null,
+  `dueDate` date not null,
+  primary key (`paymentId`)
+);
+
+INSERT INTO payments (`name`, `details`, `amount`, `createdAt`, `dueDate`) VALUES 
+	("Australia poplatky", "Zaplatit!!!", 2000, "2022-04-09", "2022-04-20"),
+	("Shakir poplatky", "Zaplatit!!!", 1000.99, "2022-02-01", "2022-02-20"),
+	("Mladez Februar", "Zaplatit!!!", 25, "2022-02-01", "2022-02-20");
+    
+create table payments_teams (
+  `id` int not null auto_increment,
+  `paymentId` int not null,
+  `teamId` varchar(50) not null,
+  primary key (`id`),
+  foreign key (`paymentId`) references payments(`paymentId`),
+  foreign key (`teamId`) references teams(`teamId`)
+);
+
+INSERT INTO payments_teams (`paymentId`, `teamId`) VALUES 
+	(1, "TWsAkjtqo9GqGtudyL5M"),
+	(2, "TWsAkjtqo9GqGtudyL5M"),
+	(3, "aQtYSI4Xr16ypOGBzeYH");
+
+create table payments_users (
+  `id` int not null auto_increment,
+  `userId` varchar(50) not null,
+  `paymentId` int not null,
+  `settledAt` datetime not null,
+  primary key (`id`),
+  foreign key (`userId`) references users(`userId`),
+  foreign key (`paymentId`) references payments(`paymentId`)
+);
    
 drop table events_teams;
 drop table attendance;
@@ -125,6 +176,10 @@ drop table events;
 drop table teams;
 drop table clubs;
 drop table users;
+drop table requests;
+drop table payments_users;
+drop table payments_teams;
+drop table payments;
     
 select * from clubs;
 select * from users;
@@ -134,6 +189,10 @@ select * from events;
 select * from attendance;
 select * from events_teams;
 select * from teams;
+select * from requests;
+select * from payments;
+select * from payments_users;
+select * from payments_teams;
 
 SELECT c.clubId, c.name, c.photoURL FROM clubs_users AS cu 
     INNER JOIN clubs AS c ON cu.clubId = c.clubId 
@@ -141,6 +200,8 @@ SELECT c.clubId, c.name, c.photoURL FROM clubs_users AS cu
     WHERE u.userId = "HZVm04WIs4aVriRAQBbeKDhnYGI2" AND cu.role = "MANAGER";
 
 SELECT teamId, name FROM teams WHERE clubId = "urI3ZiiUl3yCoFnEBtZJ";
+
+SELECT role FROM teams_users WHERE userId = "HZVm04WIs4aVriRAQBbeKDhnYGI2" AND teamId = "TWsAkjtqo9GqGtudyL5M"
 
 /*
 SELECT c.club_id, c.name, c.photoURL FROM clubs as c INNER JOIN clubs_users as cu ON c.club_id = cu.club_id WHERE user_id = 1 AND role = "MANAGER";
@@ -158,6 +219,8 @@ SELECT e.* FROM events_teams as et
     INNER JOIN events AS e ON et.event_id = e.event_id 
     INNER JOIN teams AS t ON et.team_id = t.team_id 
     WHERE et.team_id = "aQtYSI4Xr16ypOGBzeYH";
+
+SELECT * FROM users WHERE name LIKE "%Chr%";
 */
 
 DELIMITER $$
@@ -211,6 +274,25 @@ BEGIN
 END$$
 
 DELIMITER $$
+CREATE PROCEDURE acceptRequest (IN requestId VARCHAR(50), IN teamId VARCHAR(50), IN userId VARCHAR(50), IN role TEXT)
+BEGIN
+    DELETE FROM requests WHERE id = requestId;
+    INSERT INTO teams_users (`teamId`, `userId`, `role`) VALUES (teamId, userId, role);
+END$$
+
+drop procedure acceptRequest;
+
+DELIMITER $$
+CREATE PROCEDURE deletePayment (IN _paymentId int)
+BEGIN
+	DELETE FROM payments_teams WHERE paymentId = _paymentId;
+    DELETE FROM payments_users WHERE paymentId = _paymentId;
+    DELETE FROM payments WHERE paymentId = _paymentId;
+END$$
+
+drop procedure deletePayment;
+
+DELIMITER $$
 CREATE TRIGGER attendanceInserted AFTER INSERT ON attendance
 FOR EACH ROW
 BEGIN
@@ -223,20 +305,6 @@ BEGIN
 END $$
 
 DELIMITER $$
-CREATE TRIGGER attendanceUpdated AFTER UPDATE ON attendance
-FOR EACH ROW
-BEGIN
-	DECLARE _attendanceNumber SMALLINT;
-	IF NEW.isComing != OLD.isComing THEN
-		SELECT attendanceNumber INTO _attendanceNumber FROM events WHERE eventId = NEW.eventId;
-		IF NEW.isComing = true THEN
-			SET _attendanceNumber = _attendanceNumber + 1;
-		ELSE
-			SET _attendanceNumber = _attendanceNumber - 1;
-	   END IF;
-		UPDATE events SET attendanceNumber = _attendanceNumber WHERE eventId = NEW.eventId;
-	END IF;
-END $$
 
 drop trigger attendanceInserted;
 drop trigger attendanceUpdated;
