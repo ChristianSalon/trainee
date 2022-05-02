@@ -13,12 +13,20 @@ import {
   HStack,
   Pressable,
   Icon,
+  useColorModeValue,
 } from "native-base";
 import * as Yup from "yup";
-import { DatePicker, SelectTeamsInput, SelectTeamsModal } from "../components";
+import {
+  DatePicker,
+  SelectModalInput,
+  SelectTeamsInput,
+  SelectTeamsModal,
+} from "../components";
 import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import { theme } from "../themes";
+import { SelectModalInputProps } from "../types";
+import { useClub } from "../hooks";
 
 interface formValues {
   name: string;
@@ -30,31 +38,39 @@ interface formValues {
 const CreateNewPaymentScreen = ({ navigation }) => {
   const timestamp = new Date();
   timestamp.setSeconds(0, 0);
+  const { club } = useClub();
   const [dueDate, setDueDate] = useState(timestamp);
+  const [teams, setTeams] = useState<SelectModalInputProps[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /*useEffect(() => {
+  useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/events/teams/${team.clubId}`
+        `http://192.168.0.105:3000/teams/club/${club.clubId}`
       );
-      setTeams(results.data);
+      let data: SelectModalInputProps[] = [];
+      results.data.forEach((team) => {
+        data.push({
+          key: team.teamId,
+          value: team.teamId,
+          text: team.name,
+        });
+      });
+      setTeams(data);
     };
     getTeams();
-    return () => {
-      getTeams;
-    };
-  }, []);*/
+  }, []);
 
   const createPayment = async (values: formValues) => {
     console.log(values);
     axios
       .post(`http://192.168.0.105:3000/admin/payments`, {
-        teams: values.teams,
+        teamIds: values.teams.join(","),
         name: values.name,
         details: values.details,
         amount: Number(values.amount),
-        createdAt: timestamp.toISOString().replace("Z", ""),
-        dueDate: dueDate.toISOString().replace("Z", ""),
+        createdAt: timestamp.toISOString().split("T")[0],
+        dueDate: dueDate.toISOString().split("T")[0],
       })
       .then(() => {
         navigation.goBack();
@@ -66,7 +82,7 @@ const CreateNewPaymentScreen = ({ navigation }) => {
       .min(2, "Too Short!")
       .max(50, "Too Long!")
       .required("Payment name is required"),
-    details: Yup.string().max(255, "Too Long!").optional(),
+    details: Yup.string().max(255, "Too Long!").optional().nullable(),
     teams: Yup.array()
       .of(Yup.string())
       .min(1, "Choose at least 1 team")
@@ -75,92 +91,105 @@ const CreateNewPaymentScreen = ({ navigation }) => {
   });
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <Box w="full" flex="1" alignItems="center" p="20px">
-        <ScrollView w="full" flex="1">
-          <Formik
-            initialValues={{
-              name: "",
-              details: undefined,
-              teams: [],
-              amount: "",
-              dueDate: new Date(),
+    <Formik
+      initialValues={{
+        name: "",
+        details: undefined,
+        teams: [],
+        amount: "",
+        dueDate: new Date(),
+      }}
+      validationSchema={schema}
+      onSubmit={(values) => createPayment(values)}
+    >
+      {({
+        handleChange,
+        handleSubmit,
+        setFieldValue,
+        values,
+        errors,
+        touched,
+      }) => (
+        <Box
+          w="full"
+          flex="1"
+          alignItems="center"
+          p="20px"
+          bg={useColorModeValue(undefined, "dark.50")}
+        >
+          <ScrollView
+            w="full"
+            _contentContainerStyle={{
+              flex: 1,
             }}
-            validationSchema={schema}
-            onSubmit={(values) => createPayment(values)}
           >
-            {({
-              handleChange,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              touched,
-            }) => (
-              <VStack justifyContent="space-between" flex="1" space="4">
-                <VStack space="3" w="full">
-                  <Input
-                    variant="outline"
-                    w="full"
-                    placeholder="Payment name"
-                    onChangeText={handleChange("name")}
-                    value={values.name}
-                  />
-                  {errors.name && touched.name ? (
-                    <Text color="red.600" fontSize="xs">
-                      * {errors.name}
-                    </Text>
-                  ) : null}
-                  <TextArea
-                    h="100px"
-                    placeholder="Details *"
-                    onChangeText={handleChange("details")}
-                    value={values.details}
-                  />
-                  <SelectTeamsInput
-                    value={values.teams}
-                    onValueChange={(newValue: string[]) =>
-                      setFieldValue("teams", newValue)
-                    }
-                  />
-                  {errors.teams && touched.teams ? (
-                    <Text color="red.600" fontSize="xs">
-                      * {errors.teams}
-                    </Text>
-                  ) : null}
-                  <Input
-                    variant="outline"
-                    w="full"
-                    placeholder="Amount"
-                    onChangeText={handleChange("amount")}
-                    keyboardType="decimal-pad"
-                    value={values.amount}
-                  />
-                  {errors.amount && touched.amount ? (
-                    <Text color="red.600" fontSize="xs">
-                      * {errors.amount}
-                    </Text>
-                  ) : null}
-                  <DatePicker
-                    title="Due Date"
-                    date={dueDate}
-                    setDate={setDueDate}
-                  />
-                </VStack>
-                <Button
-                  variant="solid"
-                  colorScheme="primary"
+            <VStack justifyContent="space-between" flex="1" space="4">
+              <VStack space="3" w="full">
+                <Input
+                  variant="outline"
                   w="full"
-                  onPress={handleSubmit}
-                >
-                  Create Payment
-                </Button>
+                  placeholder="Payment name"
+                  onChangeText={handleChange("name")}
+                  value={values.name}
+                />
+                {errors.name && touched.name ? (
+                  <Text color="red.600" fontSize="xs">
+                    * {errors.name}
+                  </Text>
+                ) : null}
+                <TextArea
+                  h="100px"
+                  placeholder="Details *"
+                  onChangeText={handleChange("details")}
+                  value={values.details}
+                />
+                <SelectModalInput
+                  value={values.teams}
+                  onValueChange={(newValue: string[]) =>
+                    setFieldValue("teams", newValue)
+                  }
+                  isLoading={isLoading}
+                  setIsLoading={setIsLoading}
+                  placeholder={"Select Teams"}
+                  data={teams}
+                />
+                {errors.teams && touched.teams ? (
+                  <Text color="red.600" fontSize="xs">
+                    * {errors.teams}
+                  </Text>
+                ) : null}
+                <Input
+                  variant="outline"
+                  w="full"
+                  placeholder="Amount"
+                  onChangeText={handleChange("amount")}
+                  keyboardType="decimal-pad"
+                  value={values.amount}
+                />
+                {errors.amount && touched.amount ? (
+                  <Text color="red.600" fontSize="xs">
+                    * {errors.amount}
+                  </Text>
+                ) : null}
+                <DatePicker
+                  title="Due Date"
+                  date={dueDate}
+                  setDate={setDueDate}
+                />
               </VStack>
-            )}
-          </Formik>
-        </ScrollView>
-      </Box>
-    </NativeBaseProvider>
+              <Button
+                variant="solid"
+                colorScheme="primary"
+                w="full"
+                onPress={handleSubmit}
+              >
+                Create Payment
+              </Button>
+            </VStack>
+          </ScrollView>
+        </Box>
+      )}
+    </Formik>
   );
 };
 

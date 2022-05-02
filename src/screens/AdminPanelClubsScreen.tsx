@@ -28,9 +28,6 @@ const AdminPanelClubsScreen = ({ navigation }) => {
 
   useEffect(() => {
     getClubs();
-    return () => {
-      getClubs;
-    };
   }, []);
 
   /*const getUsers = () => {
@@ -49,11 +46,11 @@ const AdminPanelClubsScreen = ({ navigation }) => {
   };*/
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
       <FlatList
         data={clubs}
         renderItem={({ item }) => <Club club={item} />}
-        keyExtractor={(item) => item.club_id}
+        keyExtractor={(item) => item.clubId}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={getClubs} />
         }
@@ -61,8 +58,10 @@ const AdminPanelClubsScreen = ({ navigation }) => {
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
         onPress={() => navigation.navigate("Create New Club")}
+        placement="bottom-right"
+        renderInPortal={false}
       />
-    </NativeBaseProvider>
+    </>
   );
 };
 

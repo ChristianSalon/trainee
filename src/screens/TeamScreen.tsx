@@ -26,7 +26,7 @@ const TeamScreen = () => {
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
       <StatusBar style={"dark"} />
       <Box w="full" h="1px" bg="gray.100" />
       <ScrollView>
@@ -68,7 +68,7 @@ const TeamScreen = () => {
           </Box>
         </VStack>
       </ScrollView>
-    </NativeBaseProvider>
+    </>
   );
 };
 

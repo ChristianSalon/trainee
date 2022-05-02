@@ -38,13 +38,7 @@ const SendedAudioMessage = ({ message }) => {
 
   return (
     <Box
-      bg={{
-        linearGradient: {
-          colors: ["primary.300", "primary.600"],
-          start: [0, 0],
-          end: [1, 0],
-        },
-      }}
+      bg="primary.500"
       p="3"
       mx="2"
       my="1"

@@ -18,6 +18,7 @@ import {
   CloseIcon,
   IconButton,
   Button,
+  useColorModeValue,
 } from "native-base";
 import { theme } from "../themes";
 import { Team } from "../components";
@@ -48,16 +49,13 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     getTeams();
-    return () => {
-      getTeams;
-    };
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <StatusBar style={"dark"} />
+    <>
+      <StatusBar style={useColorModeValue("dark", "light")} />
       {isEmailVerified ? (
-        <Box flex="1" safeAreaTop>
+        <Box flex="1" bg={useColorModeValue("white", "dark.50")} safeAreaTop>
           <HStack
             px="20px"
             pt="20px"
@@ -87,7 +85,9 @@ const HomeScreen = ({ navigation }) => {
             icon={
               <Icon color="white" as={<Feather name="edit-3" />} size="sm" />
             }
-            onPress={() => navigation.navigate("Admin Panel")}
+            onPress={() => navigation.navigate("Admin Panel Clubs Screen")}
+            placement="bottom-right"
+            renderInPortal={false}
           />
         </Box>
       ) : (
@@ -129,7 +129,7 @@ const HomeScreen = ({ navigation }) => {
           </Button>
         </Center>
       )}
-    </NativeBaseProvider>
+    </>
   );
 };
 

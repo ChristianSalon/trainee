@@ -16,10 +16,10 @@ interface Props {
     id: string;
     teamId: string;
     userId: string;
-    role: string;
     date: string;
     teamName: string;
     teamPhotoURL: string;
+    clubName: string;
   };
 }
 
@@ -34,7 +34,6 @@ const Request: React.FC<Props> = ({ request }) => {
         requestId: request.id,
         teamId: request.teamId,
         userId: request.userId,
-        role: request.role,
       })
       .then(() => onClose());
   };
@@ -54,11 +53,11 @@ const Request: React.FC<Props> = ({ request }) => {
             source={{ uri: request.teamPhotoURL }}
           />
           <VStack flex="1">
-            <Text fontSize="lg" noOfLines={2} isTruncated>
-              {request.teamName}
+            <Text fontSize="md" noOfLines={2} isTruncated>
+              {request.clubName}
             </Text>
-            <Text fontSize="xs" color="gray.500" noOfLines={2} isTruncated>
-              {request.role}
+            <Text fontSize="sm" noOfLines={2} isTruncated>
+              {request.teamName}
             </Text>
           </VStack>
         </HStack>

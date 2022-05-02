@@ -1,5 +1,6 @@
 interface EventProps {
   event: {
+    teamsString: string;
     eventId: string;
     name: string;
     details: string | null;

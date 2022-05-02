@@ -10,12 +10,13 @@ import {
   VStack,
   Text,
   Heading,
+  useColorModeValue,
 } from "native-base";
 import { Agenda } from "react-native-calendars";
 import { theme } from "../themes";
 import { useTeam } from "../hooks";
 import { Event } from "../types";
-import { Event as EventComponent } from "../components";
+import { Event as EventComponent, StatusBar } from "../components";
 import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -26,9 +27,9 @@ const EventsScreen = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { team, roles } = useTeam();
 
-  const getEvents = async () => {
+  const getEvents = async (dateString: string) => {
     const results = await axios.get(
-      `http://192.168.0.105:3000/events/${team.teamId}`
+      `http://192.168.0.105:3000/events/${team.teamId}?date=${dateString}`
     );
     let events: { [key: string]: Event[] } = {};
     results.data.forEach((item: Event) => {
@@ -44,10 +45,7 @@ const EventsScreen = () => {
   };
 
   useEffect(() => {
-    getEvents();
-    return () => {
-      getEvents;
-    };
+    getEvents(new Date().toISOString().split("T")[0]);
   }, []);
 
   const renderItem = (item: Event) => {
@@ -55,13 +53,14 @@ const EventsScreen = () => {
   };
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
+      <StatusBar />
       {isLoaded ? (
         <>
           <PresenceTransition
             visible={true}
             initial={{
-              opacity: 0,
+              opacity: 0.7,
             }}
             animate={{
               opacity: 1,
@@ -73,15 +72,26 @@ const EventsScreen = () => {
             <Box w="100%" h="100%">
               <Agenda
                 items={events}
-                loadItemsForMonth={getEvents}
+                loadItemsForMonth={(date) => getEvents(date.dateString)}
                 selected={new Date()}
                 renderItem={renderItem}
                 theme={{
                   todayTextColor: theme.colors.darkText,
-                  todayBackgroundColor: theme.colors.gray[200],
-                  selectedDayBackgroundColor: theme.colors.primary[500], // calendar sel date
-                  dotColor: theme.colors.primary[500], // dots
+                  todayBackgroundColor: useColorModeValue(
+                    theme.colors.gray[200],
+                    theme.colors.gray[700]
+                  ),
+                  selectedDayBackgroundColor: theme.colors.primary[500],
+                  dotColor: theme.colors.primary[500],
                   agendaTodayColor: theme.colors.primary[500],
+                  backgroundColor: useColorModeValue(
+                    theme.colors.gray[100],
+                    theme.colors.dark[50]
+                  ),
+                  calendarBackground: useColorModeValue(
+                    theme.colors.white,
+                    theme.colors.dark[50]
+                  ),
                 }}
               />
               {(roles.isCoach || roles.isManager) && (
@@ -94,24 +104,26 @@ const EventsScreen = () => {
                     />
                   }
                   onPress={() => navigation.navigate("Create New Event")}
+                  placement="bottom-right"
+                  renderInPortal={false}
                 />
               )}
             </Box>
           </PresenceTransition>
         </>
       ) : (
-        <Center flex="1">
+        <Center flex="1" bg={useColorModeValue("white", "dark.50")}>
           <VStack space={8} width="90%" justifyContent={"space-evenly"}>
-            <Skeleton variant="text" height="10%" />
-            <Skeleton variant="text" height="10%" />
-            <Skeleton variant="text" height="10%" />
-            <Skeleton variant="text" height="10%" />
-            <Skeleton variant="text" height="10%" />
-            <Skeleton variant="text" height="10%" />
+            <Skeleton h="10%" rounded="lg" />
+            <Skeleton h="10%" rounded="lg" />
+            <Skeleton h="10%" rounded="lg" />
+            <Skeleton h="10%" rounded="lg" />
+            <Skeleton h="10%" rounded="lg" />
+            <Skeleton h="10%" rounded="lg" />
           </VStack>
         </Center>
       )}
-    </NativeBaseProvider>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import {
   IconButton,
   Pressable,
   Text,
+  useColorModeValue,
   VStack,
 } from "native-base";
 import React, { useRef, useState } from "react";
@@ -22,8 +23,8 @@ interface Props {
 const Payment: React.FC<Props> = ({ payment }) => {
   const navigation = useNavigation();
   const dueDate = new Date(payment.dueDate);
-  const bgColor = dueDate.getTime() < Date.now() ? "red.200" : "green.200";
-
+  const bgColor =
+    dueDate.getTime() < Date.now() - 86400000 ? "red.200" : "green.200";
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const onClose = () => setIsDialogOpen(false);
   const cancelRef = useRef(null);
@@ -42,11 +43,13 @@ const Payment: React.FC<Props> = ({ payment }) => {
           <Text fontSize="lg" mb="2" noOfLines={2} isTruncated>
             {payment.name}
           </Text>
-          <VStack space="1" pl="2">
-            <Text color="gray.600">
+          <VStack space="1">
+            <Text color={useColorModeValue("gray.600", "gray.500")}>
               Due date: {dueDate.toLocaleDateString()}
             </Text>
-            <Text color="gray.600">Amount: {payment.amount}€</Text>
+            <Text color={useColorModeValue("gray.600", "gray.500")}>
+              Amount: {payment.amount}€
+            </Text>
           </VStack>
         </Box>
         <VStack space="2" justifyContent="center">

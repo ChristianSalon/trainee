@@ -32,19 +32,33 @@ const ManageUsersScreen = ({ route }) => {
     setRefreshing(false);
   };
 
+  const onDelete = (userId: string) => {
+    const filteredData = users.filter((user) => user.userId !== userId);
+    setUsers(filteredData);
+  };
+
+  const onEdit = (userId: string, role: string) => {
+    setUsers(
+      users.map((user) => {
+        if (user.userId === userId) {
+          user.role = role;
+        }
+        return user;
+      })
+    );
+  };
+
   useEffect(() => {
     getUsers();
-    return () => {
-      getUsers;
-    };
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <StatusBar style={"dark"} />
+    <>
       <FlatList
         data={users}
-        renderItem={({ item }) => <User user={item} />}
+        renderItem={({ item }) => (
+          <User user={item} onDelete={onDelete} onEdit={onEdit} />
+        )}
         keyExtractor={(item) => item.userId.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={getUsers} />
@@ -53,8 +67,10 @@ const ManageUsersScreen = ({ route }) => {
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
         onPress={() => navigation.navigate("Add New Users", { team })}
+        placement="bottom-right"
+        renderInPortal={false}
       />
-    </NativeBaseProvider>
+    </>
   );
 };
 

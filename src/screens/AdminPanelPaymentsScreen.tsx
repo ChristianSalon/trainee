@@ -13,14 +13,16 @@ import { auth } from "../firebase";
 import { theme } from "../themes";
 import { AntDesign } from "@expo/vector-icons";
 import { Payment, Team } from "../components/AdminPanel";
+import { useClub } from "../hooks";
 
 const AdminPanelPaymentsScreen = ({ navigation }) => {
+  const { club } = useClub();
   const [refreshing, setRefreshing] = useState(false);
   const [payments, setPayments] = useState([]);
 
   const getPayments = async () => {
     const response = await axios.get(
-      `http://192.168.0.105:3000/admin/payments/team/TWsAkjtqo9GqGtudyL5M`
+      `http://192.168.0.105:3000/admin/payments/club/${club.clubId}`
     );
     setPayments(response.data);
   };
@@ -30,11 +32,11 @@ const AdminPanelPaymentsScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
       <FlatList
         data={payments}
         renderItem={({ item }) => <Payment payment={item} />}
-        keyExtractor={(item) => item.team_id}
+        keyExtractor={(item) => item.paymentId}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={getPayments} />
         }
@@ -42,8 +44,10 @@ const AdminPanelPaymentsScreen = ({ navigation }) => {
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
         onPress={() => navigation.navigate("Create New Payment")}
+        placement="bottom-right"
+        renderInPortal={false}
       />
-    </NativeBaseProvider>
+    </>
   );
 };
 

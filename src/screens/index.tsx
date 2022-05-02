@@ -24,6 +24,7 @@ import AdminPanelPaymentsScreen from "../screens/AdminPanelPaymentsScreen";
 import ManageUsersScreen from "../screens/ManageUsersScreen";
 import AddNewUsersScreen from "../screens/AddNewUsersScreen";
 import RequestsScreen from "../screens/RequestsScreen";
+import PaymentStatusScreen from "../screens/PaymentStatusScreen";
 
 export {
   LoginScreen,
@@ -52,4 +53,5 @@ export {
   ManageUsersScreen,
   AddNewUsersScreen,
   RequestsScreen,
+  PaymentStatusScreen,
 };

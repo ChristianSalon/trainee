@@ -19,22 +19,17 @@ const RequestsScreen = () => {
 
   useEffect(() => {
     getRequests();
-    return () => {
-      getRequests;
-    };
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <FlatList
-        data={requests}
-        renderItem={({ item }) => <Request request={item} />}
-        keyExtractor={(item) => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={getRequests} />
-        }
-      />
-    </NativeBaseProvider>
+    <FlatList
+      data={requests}
+      renderItem={({ item }) => <Request request={item} />}
+      keyExtractor={(item) => item.id.toString()}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={getRequests} />
+      }
+    />
   );
 };
 

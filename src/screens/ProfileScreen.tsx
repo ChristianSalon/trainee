@@ -10,20 +10,35 @@ import {
   HStack,
   Divider,
   Heading,
+  useColorMode,
+  useColorModeValue,
+  Center,
 } from "native-base";
-import { theme } from "../themes";
+import { theme as customTheme } from "../themes";
 import { Feather } from "@expo/vector-icons";
-import { SettingsOption } from "../components";
+import {
+  EditNameModal,
+  SettingsOption,
+  SelectOneModal,
+  SelectModal,
+  ThemeToggle,
+} from "../components";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
-import firebase from "firebase";
+import { colorModeManager } from "../colorModeManager";
+import { useTheme } from "../hooks";
 
 const ProfileScreen = ({ navigation }) => {
   const signedInUser = auth.currentUser;
   const [selectedPhotoURI, setSelectedPhotoURI] = useState(
     signedInUser.photoURL
   );
+  const [showModal, setShowModal] = useState(false);
+  const [theme, setTheme] = useState("light");
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const { setColorMode, toggleColorMode, colorMode } = useColorMode();
+  const { setPersistedTheme } = useTheme();
 
   const logout = () => {
     auth.signOut().then(() => {
@@ -80,61 +95,123 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <Box p="20px">
-        <VStack space="5">
-          <VStack space="2" alignItems="center" mb="3">
-            <Avatar
-              size="xl"
-              source={{
-                uri: selectedPhotoURI,
-              }}
-              key={selectedPhotoURI}
-            />
-            <Button
-              variant="subtle"
-              colorScheme="coolGray"
-              onPress={changePhoto}
-              rounded="xl"
-              _text={{ color: "black" }}
-            >
-              Change photo
-            </Button>
-          </VStack>
-          <SettingsOption
-            icon={<Feather name="user" size={24} color="black" />}
-            placeholder="Your name"
-            value={signedInUser.displayName}
-            onPress={() => console.log("Click")}
+    <Box
+      flex="1"
+      p="20px"
+      _light={{ bg: "white" }}
+      _dark={{ bg: "dark.50" }}
+      bg={colorMode === "dark" ? "coolGray.800" : "warmGray.50"}
+    >
+      <VStack space="5">
+        <VStack space="2" alignItems="center" mb="3">
+          <Avatar
+            size="xl"
+            source={{
+              uri: selectedPhotoURI,
+            }}
+            key={selectedPhotoURI}
           />
-          <SettingsOption
-            icon={<Feather name="mail" size={24} color="black" />}
-            placeholder="Show join requests"
-            value="Requests"
-            onPress={() => navigation.navigate("Requests")}
-          />
-          <SettingsOption
-            icon={<Feather name="credit-card" size={24} color="black" />}
-            placeholder="Change credit cards"
-            value="4401 **** ****"
-            onPress={() => console.log("Click")}
-          />
-          <Divider />
-          <SettingsOption
-            icon={<Feather name="droplet" size={24} color="black" />}
-            placeholder="Theme"
-            value="Light"
-            onPress={() => console.log("Click")}
-          />
-          <Divider />
-          <SettingsOption
-            icon={<Feather name="log-out" size={24} color="black" />}
-            value="Logout"
-            onPress={logout}
-          />
+          <Button
+            variant={useColorModeValue("subtle", "solid")}
+            colorScheme="gray"
+            onPress={changePhoto}
+            rounded="xl"
+            _text={{ color: "black" }}
+          >
+            Change photo
+          </Button>
         </VStack>
-      </Box>
-    </NativeBaseProvider>
+        <SettingsOption
+          icon={
+            <Feather
+              name="user"
+              size={24}
+              color={useColorModeValue("black", "gray")}
+            />
+          }
+          placeholder="Your name"
+          value={signedInUser.displayName}
+          onPress={() => setShowModal(true)}
+        />
+        <SettingsOption
+          icon={
+            <Feather
+              name="mail"
+              size={24}
+              color={useColorModeValue("black", "gray")}
+            />
+          }
+          placeholder="Show join requests"
+          value="Requests"
+          onPress={() => navigation.navigate("Requests")}
+        />
+        <Divider />
+        <HStack space="6" alignItems="center">
+          <Feather
+            name="droplet"
+            size={24}
+            color={useColorModeValue("black", "gray")}
+          />
+          <ThemeToggle />
+        </HStack>
+        {/*<SettingsOption
+          icon={
+            <Feather
+              name="droplet"
+              size={24}
+              color={useColorModeValue("black", "gray")}
+            />
+          }
+          placeholder="Theme"
+          value="Light"
+          onPress={() => setShowThemeModal(true)}
+        />*/}
+        <Divider />
+        <SettingsOption
+          icon={
+            <Feather
+              name="log-out"
+              size={24}
+              color={useColorModeValue("black", "gray")}
+            />
+          }
+          value="Logout"
+          onPress={logout}
+        />
+      </VStack>
+      {showModal && (
+        <EditNameModal showModal={showModal} setShowModal={setShowModal} />
+      )}
+      {/*showThemeModal && (
+        <SelectModal
+          showModal={showThemeModal}
+          setShowModal={setShowThemeModal}
+          isLoading={false}
+          headerText={"Select Theme"}
+          value={[theme]}
+          onValueChange={(value) => {
+            const theme = value[value.length - 1];
+            console.log("SET" + theme);
+            setTheme(theme);
+            setColorMode(theme);
+            colorModeManager.set(theme === "dark" ? "dark" : "light");
+            setPersistedTheme(theme);
+          }}
+          data={[
+            {
+              key: "light",
+              value: "light",
+              text: "Light",
+            },
+            {
+              key: "dark",
+              value: "dark",
+              text: "Dark",
+            },
+          ]}
+        />
+        )*/}
+    </Box>
   );
 };
 

@@ -1,16 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
+import { useStripe } from "@stripe/stripe-react-native";
+import axios from "axios";
 import {
   Box,
   Heading,
   HStack,
   IconButton,
   Pressable,
+  Spinner,
   Text,
+  useColorModeValue,
+  useToast,
   VStack,
 } from "native-base";
-import React from "react";
-import { Payment as PaymentProps } from "../../types";
-import { Feather } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Payment as PaymentProps } from "../types";
+import { auth } from "../firebase";
 
 interface Props {
   payment: PaymentProps;
@@ -19,53 +24,135 @@ interface Props {
 const Payment: React.FC<Props> = ({ payment }) => {
   const navigation = useNavigation();
   const dueDate = new Date(payment.dueDate);
-  const bgColor = dueDate.getTime() < Date.now() ? "red.200" : "green.200";
+  const timestamp = new Date();
+  let bgColor;
+  let settledText;
+  if (payment.settledAt === null && dueDate < timestamp) {
+    const diff = Math.ceil(
+      (timestamp.getTime() - dueDate.getTime()) / (1000 * 3600 * 24)
+    );
+    settledText = "Overdue " + diff + (diff === 1 ? " day" : " days");
+    bgColor = "red.200";
+  } else if (payment.settledAt === null && dueDate > timestamp) {
+    const diff = Math.ceil(
+      (dueDate.getTime() - timestamp.getTime()) / (1000 * 3600 * 24)
+    );
+    settledText = "Due in " + diff + (diff === 1 ? " day" : " days");
+    bgColor = "warning.200";
+  } else if (payment.settledAt !== null) {
+    settledText = new Date(payment.settledAt).toLocaleDateString();
+    bgColor = "primary.200";
+  }
+
+  const toast = useToast();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const fetchPaymentSheetParams = async () => {
+    const user = await axios.get(
+      `http://192.168.0.105:3000/payments/customers/${auth.currentUser.uid}`
+    );
+    const response = await axios.post(`http://192.168.0.105:3000/payments`, {
+      customerId: user.data[0].customerId,
+      accountId: payment.accountId,
+      amount: payment.amount,
+    });
+    const { paymentIntent, ephemeralKey, customer, publishableKey } =
+      await response.data;
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+      publishableKey,
+    };
+  };
+
+  const initializePaymentSheet = async () => {
+    const { paymentIntent, ephemeralKey, customer, publishableKey } =
+      await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      customFlow: false,
+      merchantDisplayName: "Trainee",
+      style: "automatic",
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async () => {
+    await initializePaymentSheet();
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      toast.show({
+        description: error.message,
+      });
+    }
+  };
 
   return (
-    <Pressable mx="2" my="4" onPress={() => {}}>
-      <Box mx={2} rounded="4px">
-        <HStack space="4">
-          <Box bg={bgColor} w="6px" />
-          <Box p={2} flex="1">
-            <Heading size="md" mb="2">
+    <>
+      <Pressable
+        mt="4"
+        mx="16px"
+        onPress={payment.settledAt ? null : openPaymentSheet}
+      >
+        <Box
+          justifyContent="center"
+          p="4"
+          rounded="md"
+          bg={useColorModeValue("white", "dark.100")}
+        >
+          <VStack space="1">
+            <HStack justifyContent="space-between" alignItems="center">
+              <Heading size="lg">{payment.amount}€</Heading>
+              <Box py="1" px="2" bg={bgColor} rounded="lg">
+                <Text fontSize="sm" color="gray.600">
+                  {settledText}
+                </Text>
+              </Box>
+            </HStack>
+            <Text
+              color={useColorModeValue("gray.600", "gray.400")}
+              fontSize="md"
+            >
               {payment.name}
-            </Heading>
-            <VStack space="1">
-              <Text color="gray.600">
-                Due date: {dueDate.toLocaleDateString()}
+            </Text>
+            {payment.details && (
+              <Text color="gray.500" fontSize="sm">
+                {payment.details}
               </Text>
-              <Text color="gray.600">Amount: {payment.amount}</Text>
-            </VStack>
-          </Box>
-          <VStack space="2" justifyContent="center">
-            <IconButton
-              size="lg"
-              borderRadius="xl"
-              variant="solid"
-              _icon={{
-                as: Feather,
-                name: "edit",
-                size: "xs",
-              }}
-              colorScheme="gray"
-              onPress={() => console.log("edit")}
-            />
-            <IconButton
-              size="lg"
-              borderRadius="xl"
-              variant="solid"
-              _icon={{
-                as: Feather,
-                name: "trash-2",
-                size: "xs",
-              }}
-              colorScheme="red"
-              onPress={() => console.log("delete")}
-            />
+            )}
           </VStack>
-        </HStack>
-      </Box>
-    </Pressable>
+        </Box>
+      </Pressable>
+
+      {/*<Box
+        justifyContent="center"
+        alignItems="center"
+        alignSelf="center"
+        p="5"
+        zIndex={10}
+        bg="gray.300"
+        rounded="md"
+        position="absolute"
+        top="0"
+        bottom="0"
+      >
+        <VStack space="2">
+          <Spinner size="lg" color="primary.500" />
+          <Text fontSize="md" color="gray.600">
+            Loading...
+          </Text>
+        </VStack>
+      </Box>*/}
+    </>
   );
 };
 

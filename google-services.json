@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "434146950832",
+    "project_id": "trainee-app-1b59f",
+    "storage_bucket": "trainee-app-1b59f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434146950832:android:2efd3e648201e224004575",
+        "android_client_info": {
+          "package_name": "com.christiansalon.trainee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "434146950832-93l6oj9kqimmgbo8km2962kpecm6rojm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlDDXUrufrYOC6TehTjOBWnPyqHBp_pjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "434146950832-93l6oj9kqimmgbo8km2962kpecm6rojm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

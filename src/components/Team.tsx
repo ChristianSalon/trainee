@@ -7,6 +7,7 @@ import {
   Avatar,
   Divider,
   Pressable,
+  useColorModeValue,
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import { useTeam } from "../hooks";
@@ -42,7 +43,11 @@ const Team: React.FC<TeamProps> = ({ team }) => {
             <Text fontSize="lg" noOfLines={1} isTruncated>
               {team.clubName}
             </Text>
-            <Text noOfLines={2} isTruncated>
+            <Text
+              color={useColorModeValue("gray.600", "gray.400")}
+              noOfLines={2}
+              isTruncated
+            >
               {team.name}
             </Text>
           </VStack>

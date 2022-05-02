@@ -1,5 +1,5 @@
 import React from "react";
-import { Center, Text, Image, NativeBaseProvider } from "native-base";
+import { Center, Text, Image, NativeBaseProvider, Box } from "native-base";
 import ImageZoom from "react-native-image-pan-zoom";
 import { Dimensions } from "react-native";
 import { theme } from "../themes";
@@ -11,7 +11,7 @@ const ImageDetailScreen = ({ route }) => {
   const height = Dimensions.get("window").height;
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
       <StatusBar style={"light"} />
       <Center justifyContent="center" safeArea pb="5" bg="black">
         <ImageZoom
@@ -30,7 +30,7 @@ const ImageDetailScreen = ({ route }) => {
           />
         </ImageZoom>
       </Center>
-    </NativeBaseProvider>
+    </>
   );
 };
 

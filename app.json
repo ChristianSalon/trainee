@@ -2,24 +2,30 @@
   "expo": {
     "name": "Trainee",
     "slug": "Trainee",
+    "scheme": "trainee",
     "version": "1.0.0",
-    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "orientation": "portrait",
     "icon": "./src/assets/logo.png",
     "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./src/assets/splash_02.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#139874"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.christiansalon.trainee",
       "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "userInterfaceStyle": "automatic",
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true,
       "package": "com.christiansalon.trainee",
       "versionCode": 1,
       "adaptiveIcon": {
@@ -36,7 +42,8 @@
         {
           "photosPermission": "Allow trainee to access your photos"
         }
-      ]
+      ],
+      ["expo-notifications"]
     ]
   }
 }

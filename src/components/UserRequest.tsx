@@ -31,7 +31,6 @@ const UserRequest: React.FC<Props> = ({ user, teamId }) => {
       .post(`http://192.168.0.105:3000/requests`, {
         teamId: teamId,
         userId: user.userId,
-        role: "MEMBER",
         date,
       })
       .then(() => onClose());

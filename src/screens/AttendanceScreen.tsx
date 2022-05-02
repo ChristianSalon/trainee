@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { NativeBaseProvider, FlatList } from "native-base";
+import { NativeBaseProvider, FlatList, Box } from "native-base";
 import { AttendanceProps } from "../types";
-import { StatusBar } from "expo-status-bar";
 import { theme } from "../themes";
-import { Attendance } from "../components";
+import { Attendance, StatusBar } from "../components";
 import axios from "axios";
 import { RefreshControl } from "react-native";
+import { useTeam } from "../hooks";
 
 const AttendanceScreen = ({ route }) => {
   const [attendance, setAttendance] = useState([]);
@@ -30,14 +30,11 @@ const AttendanceScreen = ({ route }) => {
       setAttendance(results.data);
     };
     getAttendance();
-    return () => {
-      getAttendance;
-    };
   }, []);
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <StatusBar style={"dark"} />
+    <>
+      <StatusBar />
       <FlatList
         data={attendance}
         renderItem={({ item }) => <Attendance attendance={item} />}
@@ -46,7 +43,7 @@ const AttendanceScreen = ({ route }) => {
           <RefreshControl refreshing={refreshing} onRefresh={getAttendance} />
         }
       />
-    </NativeBaseProvider>
+    </>
   );
 };
 

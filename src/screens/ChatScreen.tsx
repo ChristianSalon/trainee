@@ -10,9 +10,10 @@ import {
   KeyboardAvoidingView,
   Pressable,
   useDisclose,
+  useColorModeValue,
 } from "native-base";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
+import { StatusBar } from "../components";
 import { theme } from "../themes";
 import { db, auth, storage } from "../firebase";
 import { useTeam } from "../hooks";
@@ -119,9 +120,9 @@ const ChatScreen = () => {
   };
 
   return (
-    <NativeBaseProvider theme={theme} config={config}>
-      <StatusBar style={"dark"} />
-      <Box safeAreaTop flex="1">
+    <>
+      <StatusBar />
+      <Box safeAreaTop flex="1" bg={useColorModeValue(undefined, "dark.50")}>
         <KeyboardAvoidingView flex="1">
           <FlatList
             flex="1"
@@ -129,6 +130,7 @@ const ChatScreen = () => {
             data={messages}
             renderItem={({ item }) => renderMessage(item)}
             keyExtractor={(item) => item.data.id}
+            showsVerticalScrollIndicator={false}
           />
           <Pressable onPress={sendTextMessage}>
             <Box w="100%" h="60px" px="15px" py="10px">
@@ -156,7 +158,7 @@ const ChatScreen = () => {
         </KeyboardAvoidingView>
       </Box>
       <ChatActionSheet isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-    </NativeBaseProvider>
+    </>
   );
 };
 

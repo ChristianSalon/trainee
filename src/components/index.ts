@@ -19,6 +19,14 @@ import DTPicker from "./DateTimePicker";
 import DatePicker from "./DatePicker";
 import SelectTeamsModal from "./SelectTeamsModal";
 import SelectTeamsInput from "./SelectTeamsInput";
+import Payment from "./Payment";
+import EditNameModal from "./EditNameModal";
+import SelectModal from "./SelectModal";
+import SelectModalInput from "./SelectModalInput";
+import TextInputModal from "./TextInputModal";
+import SelectOneModal from "./SelectOneModal";
+import StatusBar from "./StatusBar";
+import ThemeToggle from "./ThemeToggle";
 
 export {
   Team,
@@ -42,4 +50,12 @@ export {
   DatePicker,
   SelectTeamsModal,
   SelectTeamsInput,
+  Payment,
+  EditNameModal,
+  SelectModal,
+  SelectModalInput,
+  TextInputModal,
+  SelectOneModal,
+  StatusBar,
+  ThemeToggle,
 };

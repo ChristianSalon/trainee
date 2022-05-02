@@ -8,20 +8,29 @@ import {
   Avatar,
   Button,
   Input,
+  useColorModeValue,
 } from "native-base";
 import { theme } from "../themes";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
+import * as Linking from "expo-linking";
 import { storage, db, auth } from "../firebase";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { Club, MysqlBoolean } from "../types";
+
+interface Props {
+  club: Club;
+}
 
 const EditClubScreen = ({ route }) => {
-  const { club } = route.params;
+  const { club }: Props = route.params;
   const navigation = useNavigation();
   const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
   const [clubName, setClubName] = useState(club.name);
   const signedInUser = auth.currentUser;
+
+  console.log(club);
 
   const save = async () => {
     const docRef = db.collection("clubs").doc(club.clubId);
@@ -81,6 +90,26 @@ const EditClubScreen = ({ route }) => {
     }
   };
 
+  const setupPayments = async () => {
+    const response = !club.accountId
+      ? await axios.post(`http://192.168.0.105:3000/payments/accounts`, {
+          email: auth.currentUser.email,
+          clubId: club.clubId,
+          businessName: clubName,
+        })
+      : await axios.get(
+          `http://192.168.0.105:3000/payments/accountLinks/${club.accountId}`
+        );
+    Linking.openURL(response.data);
+  };
+
+  const goToDashboard = async () => {
+    const response = await axios.post(
+      `http://192.168.0.105:3000/payments/dashboard/${club.accountId}`
+    );
+    Linking.openURL(response.data);
+  };
+
   const choosePhoto = async () => {
     if (Platform.OS !== "web") {
       const { status } =
@@ -104,51 +133,66 @@ const EditClubScreen = ({ route }) => {
   };
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <Box w="full" flex="1" alignItems="center" p="20px">
-        <VStack space="2" alignItems="center" mb="7" mt="7">
-          {selectedPhotoURI.length > 0 ? (
-            <Avatar
-              bg="transparent"
-              size="2xl"
-              source={{ uri: selectedPhotoURI }}
-            />
-          ) : (
-            <Avatar
-              bg="transparent"
-              size="2xl"
-              source={{ uri: club.photoURL }}
-            />
-          )}
-          <Button
-            variant="subtle"
-            colorScheme="coolGray"
-            onPress={choosePhoto}
-            rounded="xl"
-            _text={{ color: "black" }}
-          >
-            Choose photo
-          </Button>
-        </VStack>
-        <Input
-          variant="outline"
-          w="full"
-          placeholder="Club name"
-          onChangeText={(text) => setClubName(text)}
-          value={clubName}
-        />
+    <Box
+      w="full"
+      flex="1"
+      alignItems="center"
+      p="20px"
+      bg={useColorModeValue(undefined, "dark.50")}
+    >
+      <VStack space="2" alignItems="center" mb="7">
+        {selectedPhotoURI.length > 0 ? (
+          <Avatar
+            bg="transparent"
+            size="xl"
+            source={{ uri: selectedPhotoURI }}
+          />
+        ) : (
+          <Avatar bg="transparent" size="xl" source={{ uri: club.photoURL }} />
+        )}
         <Button
-          variant="solid"
-          colorScheme="primary"
-          position="absolute"
-          bottom="20px"
-          w="full"
-          onPress={save}
+          variant={useColorModeValue("subtle", "solid")}
+          colorScheme="gray"
+          onPress={choosePhoto}
+          rounded="xl"
+          _text={{ color: "black" }}
         >
-          Save
+          Choose photo
         </Button>
-      </Box>
-    </NativeBaseProvider>
+      </VStack>
+      <Input
+        variant="outline"
+        w="full"
+        placeholder="Club name"
+        onChangeText={(text) => setClubName(text)}
+        value={clubName}
+      />
+      <Box flex="1" />
+      {club.isAccountSetUp === MysqlBoolean.False ? (
+        <Button
+          variant={useColorModeValue("subtle", "solid")}
+          colorScheme="gray"
+          w="full"
+          onPress={setupPayments}
+          mb="2"
+        >
+          Setup Payments
+        </Button>
+      ) : (
+        <Button
+          variant={useColorModeValue("subtle", "solid")}
+          colorScheme="gray"
+          w="full"
+          onPress={goToDashboard}
+          mb="2"
+        >
+          Go To Dashboard
+        </Button>
+      )}
+      <Button variant="solid" colorScheme="primary" w="full" onPress={save}>
+        Save
+      </Button>
+    </Box>
   );
 };
 

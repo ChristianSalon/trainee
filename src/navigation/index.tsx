@@ -1,5 +1,9 @@
-import React from "react";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -7,6 +11,7 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer";
 import { Feather } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import {
   LoginScreen,
   RegisterScreen,
@@ -34,11 +39,30 @@ import {
   AdminPanelPaymentsScreen,
   CreateNewPaymentScreen,
   EditPaymentScreen,
+  PaymentStatusScreen,
 } from "../screens";
 import { theme } from "../themes";
+import { colorModeManager } from "../colorModeManager";
 import useTeam, { TeamProvider } from "../hooks/useTeam";
-import { Image, SafeAreaView, Text, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  useColorScheme,
+  View,
+  Appearance,
+} from "react-native";
 import { auth } from "../firebase";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import { ClubProvider } from "../hooks/useClub";
+import {
+  NativeBaseProvider,
+  useColorMode,
+  useColorModeValue,
+} from "native-base";
+import axios from "axios";
+import { ThemeProvider } from "../hooks/useTheme";
+import { useTheme } from "../hooks";
 
 const greenTopbar = {
   headerStyle: { backgroundColor: "#139874" },
@@ -46,12 +70,13 @@ const greenTopbar = {
   headerTintColor: "#fff",
 };
 
-const greyTopbar = {
+const blackTopbar = {
   headerStyle: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#18181b",
   },
-  headerTitleStyle: { color: "#000" },
-  headerTintColor: "#000",
+  headerTitleStyle: { color: "#fff" },
+  headerTintColor: "#fff",
+  headerShadowVisible: false,
 };
 
 const whiteTopbar = {
@@ -81,6 +106,14 @@ function TeamTabsScreen() {
         tabBarActiveTintColor: theme.colors.primary[500],
         tabBarInactiveTintColor: theme.colors.trueGray[300],
         tabBarLabelStyle: { paddingBottom: 5, fontSize: 10 },
+        tabBarActiveBackgroundColor: useColorModeValue(
+          undefined,
+          theme.colors.dark[50]
+        ),
+        tabBarInactiveBackgroundColor: useColorModeValue(
+          undefined,
+          theme.colors.dark[50]
+        ),
       }}
     >
       <TeamTabs.Screen
@@ -161,17 +194,26 @@ const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   return (
-    <HomeStack.Navigator screenOptions={whiteTopbar}>
+    <HomeStack.Navigator
+      screenOptions={useColorModeValue(whiteTopbar, blackTopbar)}
+    >
       <HomeStack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#18181b",
+          },
+          headerTitleStyle: { color: "#fff" },
+          headerTintColor: "#fff",
+        }}
       />
       <HomeStack.Screen name="Profile" component={ProfileScreen} />
       <HomeStack.Screen name="Requests" component={RequestsScreen} />
       <HomeStack.Screen
-        name="Admin Panel"
-        component={AdminDrawerScreen}
+        name="Admin Panel Clubs Screen"
+        component={AdminPanelClubsStackScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>
@@ -181,22 +223,46 @@ function HomeStackScreen() {
 const AdminDrawer = createDrawerNavigator();
 
 function AdminDrawerScreen() {
+  const { colorMode } = useColorMode();
   return (
     <AdminDrawer.Navigator
       screenOptions={{
-        headerShadowVisible: false,
+        ...useColorModeValue(whiteTopbar, blackTopbar),
+        /*headerStyle: {
+          backgroundColor: useColorModeValue(undefined, theme.colors.dark[50]),
+        },
+        headerTitleStyle: { color: "#fff" },
+        headerTintColor: "#fff",
+        headerShadowVisible: false,*/
         drawerActiveTintColor: theme.colors.primary[500],
+        drawerInactiveTintColor: useColorModeValue(
+          undefined,
+          theme.colors.gray[600]
+        ),
+        drawerInactiveBackgroundColor: useColorModeValue(
+          undefined,
+          theme.colors.gray[800]
+        ),
       }}
       drawerContent={(props) => {
         return (
-          <SafeAreaView style={{ flex: 1, paddingTop: 70 }}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              paddingTop: 70,
+              backgroundColor: colorMode === "light" ? "white" : "#18181b",
+            }}
+          >
             <Text
               style={{
                 paddingBottom: 40,
                 paddingHorizontal: 16,
                 fontSize: 28,
                 fontWeight: "bold",
-                color: theme.colors.gray[700],
+                color:
+                  colorMode === "light"
+                    ? theme.colors.gray[700]
+                    : theme.colors.gray[400],
               }}
             >
               Admin Panel
@@ -207,14 +273,9 @@ function AdminDrawerScreen() {
       }}
     >
       <AdminDrawer.Screen
-        name="Admin Panel Clubs Screen"
-        component={AdminPanelClubsStackScreen}
-        options={{ title: "My Clubs" }}
-      />
-      <AdminDrawer.Screen
         name="Admin Panel Teams Screen"
         component={AdminPanelTeamsStackScreen}
-        options={{ title: "My Teams" }}
+        options={{ title: "Teams" }}
       />
       <AdminDrawer.Screen
         name="Admin Panel Payments Screen"
@@ -229,21 +290,30 @@ const AdminPanelClubsStack = createNativeStackNavigator();
 
 function AdminPanelClubsStackScreen() {
   return (
-    <AdminPanelClubsStack.Navigator screenOptions={{ headerShown: false }}>
-      <AdminPanelClubsStack.Screen
-        name="Admin Panel Clubs Screen"
-        component={AdminPanelClubsScreen}
-        options={{ title: "Clubs" }}
-      />
-      <AdminPanelClubsStack.Screen
-        name="Create New Club"
-        component={CreateNewClubScreen}
-      />
-      <AdminPanelClubsStack.Screen
-        name="Edit Club"
-        component={EditClubScreen}
-      />
-    </AdminPanelClubsStack.Navigator>
+    <ClubProvider>
+      <AdminPanelClubsStack.Navigator
+        screenOptions={useColorModeValue(whiteTopbar, blackTopbar)}
+      >
+        <AdminPanelClubsStack.Screen
+          name="Admin Panel Clubs Screen"
+          component={AdminPanelClubsScreen}
+          options={{ title: "Your Clubs" }}
+        />
+        <AdminPanelClubsStack.Screen
+          name="Create New Club"
+          component={CreateNewClubScreen}
+        />
+        <AdminPanelClubsStack.Screen
+          name="Edit Club"
+          component={EditClubScreen}
+        />
+        <AdminPanelClubsStack.Screen
+          name="Admin Panel"
+          component={AdminDrawerScreen}
+          options={{ headerShown: false }}
+        />
+      </AdminPanelClubsStack.Navigator>
+    </ClubProvider>
   );
 }
 
@@ -306,6 +376,10 @@ function AdminPanelPaymentsStackScreen() {
         name="Edit Payment"
         component={EditPaymentScreen}
       />
+      <AdminPanelPaymentsStack.Screen
+        name="Payment Status"
+        component={PaymentStatusScreen}
+      />
     </AdminPanelPaymentsStack.Navigator>
   );
 }
@@ -314,8 +388,10 @@ const PaymentStack = createNativeStackNavigator();
 
 function PaymentStackScreen() {
   return (
-    <PaymentStack.Navigator screenOptions={whiteTopbar}>
-      <PaymentStack.Screen name="Payment" component={PaymentScreen} />
+    <PaymentStack.Navigator
+      screenOptions={useColorModeValue(whiteTopbar, blackTopbar)}
+    >
+      <PaymentStack.Screen name="Payments" component={PaymentScreen} />
     </PaymentStack.Navigator>
   );
 }
@@ -324,15 +400,19 @@ const EventsStack = createNativeStackNavigator();
 
 function EventsStackScreen() {
   return (
-    <EventsStack.Navigator screenOptions={whiteTopbar}>
+    <EventsStack.Navigator
+      screenOptions={useColorModeValue(whiteTopbar, blackTopbar)}
+    >
       <EventsStack.Screen name="Events" component={EventsScreen} />
       <EventsStack.Screen
         name="Event"
         component={EventScreen}
         options={{
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
           headerTransparent: true,
           title: "",
-          headerTintColor: "#fff",
         }}
       />
       <EventsStack.Screen name="Attendance" component={AttendanceScreen} />
@@ -348,7 +428,9 @@ const ChatStack = createNativeStackNavigator();
 
 function ChatStackScreen() {
   return (
-    <ChatStack.Navigator screenOptions={whiteTopbar}>
+    <ChatStack.Navigator
+      screenOptions={useColorModeValue(whiteTopbar, blackTopbar)}
+    >
       <ChatStack.Screen
         name="Chat"
         component={ChatScreen}
@@ -356,6 +438,9 @@ function ChatStackScreen() {
       />
       <ChatStack.Screen
         options={{
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
           headerTransparent: true,
           title: "",
           headerTintColor: "#fff",
@@ -365,6 +450,9 @@ function ChatStackScreen() {
       />
       <ChatStack.Screen
         options={{
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
           headerTransparent: true,
           title: "",
           headerTintColor: "#fff",
@@ -391,18 +479,69 @@ function RootStackScreen() {
   );
 }
 
-const navigationContainerTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: "#fff",
-  },
-};
-
 export default function Navigation() {
+  const linking = {
+    prefixes: [Linking.createURL("/"), "trainee://", "http://localhost:19002"],
+  };
+
+  /*const { colorMode } = useColorMode();
+  const colorScheme = useColorScheme();
+  console.log(`${colorMode} - ${colorScheme} - ${Appearance.getColorScheme()}`);*/
+  const { persistedTheme } = useTheme();
+  const [navigationContainerTheme, setNavigationContainerTheme] = useState<{
+    dark: boolean;
+    colors: {
+      background: string;
+      primary: string;
+      card: string;
+      text: string;
+      border: string;
+      notification: string;
+    };
+  }>({ ...DefaultTheme });
+
+  useEffect(() => {
+    console.log("Persisted Theme - " + persistedTheme);
+    setNavigationContainerTheme(
+      persistedTheme === "light"
+        ? {
+            ...DefaultTheme,
+            dark: false,
+            colors: {
+              ...DefaultTheme.colors,
+              background: theme.colors.white,
+            },
+          }
+        : {
+            ...DarkTheme,
+            dark: true,
+            colors: {
+              ...DarkTheme.colors,
+              background: theme.colors.dark[50],
+            },
+          }
+    );
+  }, [persistedTheme]);
+
+  /*const navigationContainerThemee = {
+    ...DarkTheme,
+    dark: true,
+    colors: {
+      ...DarkTheme.colors,
+      background: theme.colors.dark[50],
+    },
+  };*/
+
   return (
-    <NavigationContainer theme={navigationContainerTheme}>
-      <RootStackScreen />
-    </NavigationContainer>
+    <StripeProvider
+      publishableKey="pk_test_51KqHnWBPMHj98s1MrdNH42HuT1IVh2Sx9SYOuEN4C3nmJvVPXxjxl5YZ2wsTMjP1p43MK7Q5FL66ePov4RF5XvR600SV0CmyiN"
+      urlScheme="http://192.168.0.105:3000"
+    >
+      <NavigationContainer linking={linking} theme={navigationContainerTheme}>
+        <NativeBaseProvider theme={theme} colorModeManager={colorModeManager}>
+          <RootStackScreen />
+        </NativeBaseProvider>
+      </NavigationContainer>
+    </StripeProvider>
   );
 }

@@ -8,6 +8,7 @@ import {
   Avatar,
   Button,
   Input,
+  useColorModeValue,
 } from "native-base";
 import { theme } from "../themes";
 import * as ImagePicker from "expo-image-picker";
@@ -16,7 +17,9 @@ import { storage, db, auth } from "../firebase";
 import axios from "axios";
 
 const CreateNewClubScreen = ({ navigation }) => {
-  const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
+  const [selectedPhotoURI, setSelectedPhotoURI] = useState(
+    "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229"
+  );
   const [clubName, setClubName] = useState("");
   const signedInUser = auth.currentUser;
 
@@ -40,24 +43,29 @@ const CreateNewClubScreen = ({ navigation }) => {
     await ref.put(blob);
     blob.close();
 
-    ref.getDownloadURL().then((url) => {
-      axios
-        .post(`http://192.168.0.105:3000/admin/clubs/${signedInUser.uid}`, {
+    ref.getDownloadURL().then(async (url) => {
+      await axios.post(
+        `http://192.168.0.105:3000/admin/clubs/${signedInUser.uid}`,
+        {
           clubId: docRef.id,
           name: clubName,
           photoURL: url,
-        })
-        .then(() => {
-          docRef.set({
-            id: docRef.id,
-            name: clubName,
-            photoURL: url,
-            managers: [signedInUser.uid],
-            coaches: [],
-            members: [],
-          });
-          navigation.goBack();
-        });
+        }
+      );
+      docRef.set({
+        id: docRef.id,
+        name: clubName,
+        photoURL: url,
+        managers: [signedInUser.uid],
+        coaches: [],
+        members: [],
+      });
+      await axios.post(`http://192.168.0.105:3000/payments/accounts`, {
+        email: auth.currentUser.email,
+        clubId: docRef.id,
+        businessName: clubName,
+      });
+      navigation.goBack();
     });
   };
 
@@ -84,52 +92,49 @@ const CreateNewClubScreen = ({ navigation }) => {
   };
 
   return (
-    <NativeBaseProvider theme={theme}>
-      <Box w="full" flex="1" alignItems="center" p="20px">
-        <VStack space="2" alignItems="center" mb="7">
-          {selectedPhotoURI.length > 0 ? (
-            <Avatar
-              bg="transparent"
-              size="xl"
-              source={{ uri: selectedPhotoURI }}
-            />
-          ) : (
-            <Avatar
-              bg="transparent"
-              size="xl"
-              source={require("../assets/default_photo.png")}
-            />
-          )}
-          <Button
-            variant="subtle"
-            colorScheme="coolGray"
-            onPress={choosePhoto}
-            rounded="xl"
-            _text={{ color: "black" }}
-          >
-            Choose photo
-          </Button>
-        </VStack>
-        <VStack space="3" flex="1" w="full">
-          <Input
-            variant="outline"
-            w="full"
-            placeholder="Club name"
-            onChangeText={(text) => setClubName(text)}
-            value={clubName}
-          />
-          <Box flex="1" />
-          <Button
-            variant="solid"
-            colorScheme="primary"
-            w="full"
-            onPress={createClub}
-          >
-            Create Club
-          </Button>
-        </VStack>
-      </Box>
-    </NativeBaseProvider>
+    <Box
+      w="full"
+      flex="1"
+      alignItems="center"
+      p="20px"
+      bg={useColorModeValue(undefined, "dark.50")}
+    >
+      <VStack space="2" alignItems="center" mb="7">
+        <Avatar
+          bg="transparent"
+          size="xl"
+          source={{ uri: selectedPhotoURI }}
+          key={selectedPhotoURI}
+        />
+        <Button
+          variant={useColorModeValue("subtle", "solid")}
+          colorScheme="gray"
+          onPress={choosePhoto}
+          rounded="xl"
+          _text={{ color: "black" }}
+        >
+          Choose photo
+        </Button>
+      </VStack>
+      <VStack space="3" flex="1" w="full">
+        <Input
+          variant="outline"
+          w="full"
+          placeholder="Club name"
+          onChangeText={(text) => setClubName(text)}
+          value={clubName}
+        />
+        <Box flex="1" />
+        <Button
+          variant="solid"
+          colorScheme="primary"
+          w="full"
+          onPress={createClub}
+        >
+          Create Club
+        </Button>
+      </VStack>
+    </Box>
   );
 };
 

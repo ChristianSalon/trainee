@@ -3,5 +3,6 @@ interface User {
   name: string;
   photoURL: string;
   email: string;
+  customerid: string | null;
 }
 export default User;

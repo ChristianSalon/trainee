@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform } from "react-native";
-import { Box, HStack, Pressable, Text, VStack } from "native-base";
+import {
+  Box,
+  HStack,
+  Pressable,
+  Text,
+  useColorModeValue,
+  VStack,
+} from "native-base";
 
 const DTPicker = ({ title, date, setDate }) => {
   const [mode, setMode] = useState("date");
@@ -29,7 +36,7 @@ const DTPicker = ({ title, date, setDate }) => {
   return (
     <VStack space="1">
       <HStack justifyContent="space-between">
-        <Text color="dark.300" fontSize="12">
+        <Text color={useColorModeValue("dark.300", "gray.500")} fontSize="12">
           {title}
         </Text>
       </HStack>
@@ -41,7 +48,7 @@ const DTPicker = ({ title, date, setDate }) => {
         flexDirection="row"
         justifyContent="space-between"
         alignItems="center"
-        borderColor="gray.200"
+        borderColor={useColorModeValue("gray.200", "gray.500")}
         borderWidth="1"
       >
         <Pressable fontSize="sm" onPress={showDatePicker}>

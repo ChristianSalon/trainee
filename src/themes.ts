@@ -1,6 +1,9 @@
-import { extendTheme } from "native-base";
+import { extendTheme, themeTools, useColorModeValue } from "native-base";
 
 const theme = extendTheme({
+  config: {
+    useSystemColorMode: false,
+  },
   colors: {
     primary: {
       50: "#E3F2F9",
@@ -29,8 +32,24 @@ const theme = extendTheme({
   },
   components: {
     FlatList: {
-      baseStyle: {
-        color: "emerald.400",
+      baseStyle: (props: any) => {
+        return {
+          bgColor: themeTools.mode("white", "dark.50")(props),
+        };
+      },
+    },
+    Heading: {
+      baseStyle: (props: any) => {
+        return {
+          color: themeTools.mode("dark.100", "light.300")(props),
+        };
+      },
+    },
+    Text: {
+      baseStyle: (props: any) => {
+        return {
+          color: themeTools.mode("darkText", "light.300")(props),
+        };
       },
     },
   },

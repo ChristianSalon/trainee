@@ -1,13 +1,13 @@
 import { Video } from "expo-av";
 import { StatusBar } from "expo-status-bar";
-import { Center, NativeBaseProvider } from "native-base";
+import { Box, Center, NativeBaseProvider } from "native-base";
 import React from "react";
 import { theme } from "../themes";
 
 const VideoDetailScreen = ({ route }) => {
   const { uri } = route.params;
   return (
-    <NativeBaseProvider theme={theme}>
+    <>
       <StatusBar style={"light"} />
       <Center justifyContent="center" safeArea pb="5" bg="black">
         <Video
@@ -20,7 +20,7 @@ const VideoDetailScreen = ({ route }) => {
           resizeMode="contain"
         />
       </Center>
-    </NativeBaseProvider>
+    </>
   );
 };
 
