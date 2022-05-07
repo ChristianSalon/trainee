@@ -56,7 +56,7 @@ const EditClubScreen = ({ route }) => {
 
       ref.getDownloadURL().then((url) => {
         axios
-          .put(`http://192.168.0.105:3000/admin/clubs/${club.clubId}`, {
+          .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
             name: clubName,
             photoURL: url,
           })
@@ -73,7 +73,7 @@ const EditClubScreen = ({ route }) => {
       });
     } else {
       axios
-        .put(`http://192.168.0.105:3000/admin/clubs/${club.clubId}`, {
+        .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
           name: clubName,
           photoURL: club.photoURL,
         })
@@ -92,20 +92,20 @@ const EditClubScreen = ({ route }) => {
 
   const setupPayments = async () => {
     const response = !club.accountId
-      ? await axios.post(`http://192.168.0.105:3000/payments/accounts`, {
+      ? await axios.post(`https://trainee.software/payments/accounts`, {
           email: auth.currentUser.email,
           clubId: club.clubId,
           businessName: clubName,
         })
       : await axios.get(
-          `http://192.168.0.105:3000/payments/accountLinks/${club.accountId}`
+          `https://trainee.software/payments/accountLinks/${club.accountId}`
         );
     Linking.openURL(response.data);
   };
 
   const goToDashboard = async () => {
     const response = await axios.post(
-      `http://192.168.0.105:3000/payments/dashboard/${club.accountId}`
+      `https://trainee.software/payments/dashboard/${club.accountId}`
     );
     Linking.openURL(response.data);
   };

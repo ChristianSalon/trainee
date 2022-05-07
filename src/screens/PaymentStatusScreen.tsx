@@ -16,7 +16,7 @@ const PaymentStatusScreen = ({ route }) => {
   const getPaymentStatus = async () => {
     setRefreshing(true);
     const results = await axios.get(
-      `http://192.168.0.105:3000/admin/payments/${payment.paymentId}`
+      `https://trainee.software/admin/payments/${payment.paymentId}`
     );
     setPaymentStatus(results.data);
     setRefreshing(false);
@@ -25,7 +25,7 @@ const PaymentStatusScreen = ({ route }) => {
   useEffect(() => {
     const getPaymentStatus = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/admin/payments/${payment.paymentId}`
+        `https://trainee.software/admin/payments/${payment.paymentId}`
       );
       setPaymentStatus(results.data);
     };

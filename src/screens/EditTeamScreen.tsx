@@ -29,7 +29,7 @@ const EditTeamScreen = ({ route }) => {
   useEffect(() => {
     const getClubs = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/admin/clubs/${signedInUser.uid}`
+        `https://trainee.software/admin/clubs/${signedInUser.uid}`
       );
       setClubs(results.data);
     };
@@ -60,7 +60,7 @@ const EditTeamScreen = ({ route }) => {
 
       ref.getDownloadURL().then((url) => {
         axios
-          .put(`http://192.168.0.105:3000/admin/teams/${team.teamId}`, {
+          .put(`https://trainee.software/admin/teams/${team.teamId}`, {
             name: teamName,
             photoURL: url,
           })
@@ -77,7 +77,7 @@ const EditTeamScreen = ({ route }) => {
       });
     } else {
       axios
-        .put(`http://192.168.0.105:3000/admin/teams/${team.teamId}`, {
+        .put(`https://trainee.software/admin/teams/${team.teamId}`, {
           name: teamName,
           photoURL: team.photoURL,
         })

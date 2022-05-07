@@ -15,7 +15,7 @@ const AttendanceScreen = ({ route }) => {
   const getAttendance = async () => {
     setRefreshing(true);
     const results = await axios.get(
-      `http://192.168.0.105:3000/attendance/${eventId}`
+      `https://trainee.software/attendance/${eventId}`
     );
     setAttendance(results.data);
     setRefreshing(false);
@@ -25,7 +25,7 @@ const AttendanceScreen = ({ route }) => {
   useEffect(() => {
     const getAttendance = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/attendance/${eventId}`
+        `https://trainee.software/attendance/${eventId}`
       );
       setAttendance(results.data);
     };

@@ -28,7 +28,7 @@ const UserRequest: React.FC<Props> = ({ user, teamId }) => {
   const sendRequest = () => {
     const date = new Date().toISOString().slice(0, -8);
     axios
-      .post(`http://192.168.0.105:3000/requests`, {
+      .post(`https://trainee.software/requests`, {
         teamId: teamId,
         userId: user.userId,
         date,

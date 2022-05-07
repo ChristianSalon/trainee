@@ -33,7 +33,7 @@ const AdminPanelTeamsScreen = ({ route }) => {
 
   const getTeams = async () => {
     const response = await axios.get(
-      `http://192.168.0.105:3000/admin/teams/club/${clubId}/user/${auth.currentUser.uid}`
+      `https://trainee.software/admin/teams/club/${clubId}/user/${auth.currentUser.uid}`
     );
     setTeams(response.data);
   };

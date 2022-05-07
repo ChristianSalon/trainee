@@ -26,7 +26,7 @@ const ManageUsersScreen = ({ route }) => {
       setRefreshing(true);
     }
     const results = await axios.get(
-      `http://192.168.0.105:3000/admin/users/${team.teamId}`
+      `https://trainee.software/admin/users/${team.teamId}`
     );
     setUsers(results.data);
     setRefreshing(false);

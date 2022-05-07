@@ -226,6 +226,8 @@ select * from payments_teams;
 
 /*UPDATE clubs SET  accountId = 'acct_1KqepjBDdBqJhPkT' WHERE clubId = "urI3ZiiUl3yCoFnEBtZJ";*/
 
+SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
 SELECT p.*, GROUP_CONCAT(t.teamId SEPARATOR ', ') AS "teamsIds" FROM payments_teams AS pt 
     INNER JOIN payments AS p ON pt.paymentId = p.paymentId
     INNER JOIN teams AS t ON pt.teamId = t.teamId
@@ -259,6 +261,11 @@ SELECT u.*, t.teamId, GROUP_CONCAT(tu.role SEPARATOR ", ") AS "roles" FROM teams
     INNER JOIN teams AS t ON tu.teamId = t.teamId 
     INNER JOIN users AS u ON tu.userId = u.userId 
     GROUP BY t.teamId;
+
+UPDATE payments_users AS pu 
+	INNER JOIN users AS u ON pu.userId = u.userId
+	SET pu.settledAt = "2022-05-03"
+	WHERE u.customerId = "cus_LXmSwz1blH1MOK" AND pu.paymentId = 18;
 
 /*
 SELECT c.club_id, c.name, c.photoURL FROM clubs as c INNER JOIN clubs_users as cu ON c.club_id = cu.club_id WHERE user_id = 1 AND role = "MANAGER";

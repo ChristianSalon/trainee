@@ -19,7 +19,7 @@ const EditNameModal = ({ showModal, setShowModal }) => {
 
   const saveName = async () => {
     const response = await axios.put(
-      `http://192.168.0.105:3000/users/editName/${auth.currentUser.uid}`,
+      `https://trainee.software/users/editName/${auth.currentUser.uid}`,
       { name: name }
     );
     auth.currentUser

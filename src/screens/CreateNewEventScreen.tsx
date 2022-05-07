@@ -49,7 +49,7 @@ const CreateNewEventScreen = ({ navigation }) => {
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/teams/club/${team.clubId}`
+        `https://trainee.software/teams/club/${team.clubId}`
       );
       let data: SelectModalInputProps[] = [];
       results.data.forEach((team) => {
@@ -71,7 +71,7 @@ const CreateNewEventScreen = ({ navigation }) => {
     const endTime = endDate.toLocaleTimeString().slice(0, 5);
     console.log(startTime + " - " + endTime);
     axios
-      .post(`http://192.168.0.105:3000/events`, {
+      .post(`https://trainee.software/events`, {
         teams: values.teams,
         eventId: docRef.id,
         name: values.name,

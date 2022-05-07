@@ -535,7 +535,7 @@ export default function Navigation() {
   return (
     <StripeProvider
       publishableKey="pk_test_51KqHnWBPMHj98s1MrdNH42HuT1IVh2Sx9SYOuEN4C3nmJvVPXxjxl5YZ2wsTMjP1p43MK7Q5FL66ePov4RF5XvR600SV0CmyiN"
-      urlScheme="http://192.168.0.105:3000"
+      urlScheme="https://trainee.software"
     >
       <NavigationContainer linking={linking} theme={navigationContainerTheme}>
         <NativeBaseProvider theme={theme} colorModeManager={colorModeManager}>

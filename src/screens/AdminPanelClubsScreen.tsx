@@ -21,7 +21,7 @@ const AdminPanelClubsScreen = ({ navigation }) => {
 
   const getClubs = async () => {
     const response = await axios.get(
-      `http://192.168.0.105:3000/admin/clubs/${auth.currentUser.uid}`
+      `https://trainee.software/admin/clubs/${auth.currentUser.uid}`
     );
     setClubs(response.data);
   };
@@ -32,7 +32,7 @@ const AdminPanelClubsScreen = ({ navigation }) => {
 
   /*const getUsers = () => {
     axios
-      .get("http://192.168.0.105:3000/clubs")
+      .get("https://trainee.software/clubs")
       .then((response) => {
         // handle success
         console.log(response);

@@ -27,7 +27,7 @@ const Team: React.FC<TeamProps> = ({ team }) => {
       clubId: team.clubId,
     });
     const results = await axios.get(
-      `http://192.168.0.105:3000/roles/team/${team.teamId}/user/${auth.currentUser.uid}`
+      `https://trainee.software/roles/team/${team.teamId}/user/${auth.currentUser.uid}`
     );
     setRoles(results.data);
     navigation.navigate("Team", { team });

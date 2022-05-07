@@ -29,7 +29,7 @@ const EventsScreen = () => {
 
   const getEvents = async (dateString: string) => {
     const results = await axios.get(
-      `http://192.168.0.105:3000/events/${team.teamId}?date=${dateString}`
+      `https://trainee.software/events/${team.teamId}?date=${dateString}`
     );
     let events: { [key: string]: Event[] } = {};
     results.data.forEach((item: Event) => {

@@ -30,7 +30,7 @@ const Request: React.FC<Props> = ({ request }) => {
 
   const acceptRequest = () => {
     axios
-      .post(`http://192.168.0.105:3000/requests/acceptRequest`, {
+      .post(`https://trainee.software/requests/acceptRequest`, {
         requestId: request.id,
         teamId: request.teamId,
         userId: request.userId,

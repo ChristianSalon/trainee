@@ -49,7 +49,7 @@ const CreateNewTeamScreen = ({ navigation }) => {
 
     ref.getDownloadURL().then((url) => {
       axios
-        .post(`http://192.168.0.105:3000/admin/teams/${signedInUser.uid}`, {
+        .post(`https://trainee.software/admin/teams/${signedInUser.uid}`, {
           teamId: docRef.id,
           clubId: club.clubId,
           name: teamName,

@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import {
   NativeBaseProvider,
   FlatList,
@@ -97,7 +97,7 @@ const ChatScreen = () => {
     }
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const unsubscribe = db
       .collection("teams")
       .doc(team.teamId)
@@ -110,7 +110,9 @@ const ChatScreen = () => {
           }))
         );
       });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const config = {

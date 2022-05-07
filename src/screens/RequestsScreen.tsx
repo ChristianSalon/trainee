@@ -12,7 +12,7 @@ const RequestsScreen = () => {
 
   const getRequests = async () => {
     const response = await axios.get(
-      `http://192.168.0.105:3000/requests/${auth.currentUser.uid}`
+      `https://trainee.software/requests/${auth.currentUser.uid}`
     );
     setRequests(response.data);
   };

@@ -12,6 +12,7 @@ import {
   useColorModeValue,
   useToast,
   VStack,
+  useColorMode,
 } from "native-base";
 import React, { useState } from "react";
 import { Payment as PaymentProps } from "../types";
@@ -19,9 +20,10 @@ import { auth } from "../firebase";
 
 interface Props {
   payment: PaymentProps;
+  onRefresh: () => Promise<void>;
 }
 
-const Payment: React.FC<Props> = ({ payment }) => {
+const Payment: React.FC<Props> = ({ payment, onRefresh }) => {
   const navigation = useNavigation();
   const dueDate = new Date(payment.dueDate);
   const timestamp = new Date();
@@ -45,17 +47,19 @@ const Payment: React.FC<Props> = ({ payment }) => {
   }
 
   const toast = useToast();
+  const { colorMode } = useColorMode();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
 
   const fetchPaymentSheetParams = async () => {
     const user = await axios.get(
-      `http://192.168.0.105:3000/payments/customers/${auth.currentUser.uid}`
+      `https://trainee.software/payments/customers/${auth.currentUser.uid}`
     );
-    const response = await axios.post(`http://192.168.0.105:3000/payments`, {
+    const response = await axios.post(`https://trainee.software/payments`, {
       customerId: user.data[0].customerId,
       accountId: payment.accountId,
       amount: payment.amount,
+      paymentId: payment.paymentId,
     });
     const { paymentIntent, ephemeralKey, customer, publishableKey } =
       await response.data;
@@ -78,7 +82,7 @@ const Payment: React.FC<Props> = ({ payment }) => {
       paymentIntentClientSecret: paymentIntent,
       customFlow: false,
       merchantDisplayName: "Trainee",
-      style: "automatic",
+      style: colorMode === "light" ? "alwaysLight" : "alwaysDark",
     });
     if (!error) {
       setLoading(true);
@@ -88,11 +92,17 @@ const Payment: React.FC<Props> = ({ payment }) => {
   const openPaymentSheet = async () => {
     await initializePaymentSheet();
     const { error } = await presentPaymentSheet();
+    //const stripe = useStripe();
 
     if (error) {
       toast.show({
         description: error.message,
       });
+    } else {
+      toast.show({
+        description: "Payment successful",
+      });
+      await onRefresh();
     }
   };
 

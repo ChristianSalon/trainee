@@ -33,7 +33,7 @@ const HomeScreen = ({ navigation }) => {
 
   const getTeams = async () => {
     const results = await axios.get(
-      `http://192.168.0.105:3000/teams/${auth.currentUser.uid}`
+      `https://trainee.software/teams/${auth.currentUser.uid}`
     );
     setTeams(results.data);
   };

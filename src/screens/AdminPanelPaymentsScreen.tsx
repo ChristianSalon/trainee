@@ -22,7 +22,7 @@ const AdminPanelPaymentsScreen = ({ navigation }) => {
 
   const getPayments = async () => {
     const response = await axios.get(
-      `http://192.168.0.105:3000/admin/payments/club/${club.clubId}`
+      `https://trainee.software/admin/payments/club/${club.clubId}`
     );
     setPayments(response.data);
   };

@@ -31,7 +31,7 @@ const Payment: React.FC<Props> = ({ payment }) => {
 
   const deletePayment = () => {
     axios
-      .delete(`http://192.168.0.105:3000/admin/payments/${payment.paymentId}`)
+      .delete(`https://trainee.software/admin/payments/${payment.paymentId}`)
       .then(() => onClose());
   };
 

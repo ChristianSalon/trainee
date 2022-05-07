@@ -36,7 +36,7 @@ const User: React.FC<Props> = ({ user, onDelete, onEdit }) => {
 
   const removeUser = async () => {
     const response = await axios.delete(
-      `http://192.168.0.105:3000/admin/users/${user.teamId}/${user.userId}`
+      `https://trainee.software/admin/users/${user.teamId}/${user.userId}`
     );
     if (response.status === 200) {
       toast.show({ description: "User removed from team." });
@@ -51,7 +51,7 @@ const User: React.FC<Props> = ({ user, onDelete, onEdit }) => {
       return;
     }
     const response = await axios.put(
-      `http://192.168.0.105:3000/admin/users/editRole/${user.userId}`,
+      `https://trainee.software/admin/users/editRole/${user.userId}`,
       {
         role,
       }

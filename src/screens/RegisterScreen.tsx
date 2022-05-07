@@ -37,14 +37,14 @@ const RegisterScreen = ({ navigation }) => {
             "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
         });
         authUser.user.sendEmailVerification();
-        axios.post(`http://192.168.0.105:3000/users`, {
+        axios.post(`https://trainee.software/users`, {
           userId: authUser.user.uid,
           name: name,
           photoURL:
             "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
           email: email,
         });
-        axios.post(`http://192.168.0.105:3000/payments/customers`, {
+        axios.post(`https://trainee.software/payments/customers`, {
           userId: authUser.user.uid,
           name: name,
           email: email,

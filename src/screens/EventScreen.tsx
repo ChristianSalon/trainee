@@ -40,7 +40,7 @@ const EventScreen = ({ route }) => {
   useEffect(() => {
     const getAttendance = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/attendance/${event.eventId}`
+        `https://trainee.software/attendance/${event.eventId}`
       );
       results.data.forEach((a) => {
         if (a.userId === auth.currentUser.uid) {
@@ -115,7 +115,7 @@ const EventScreen = ({ route }) => {
 
     if (answered && isComingParameter) {
       await axios.put(
-        `http://192.168.0.105:3000/attendance/${myAttendance.id}`,
+        `https://trainee.software/attendance/${myAttendance.id}`,
         {
           isComing: isComingParameter,
           date: dateString,
@@ -127,7 +127,7 @@ const EventScreen = ({ route }) => {
     } else if (answered && !isComingParameter) {
       setShowModal(true);
     } else if (isComingParameter) {
-      await axios.post(`http://192.168.0.105:3000/attendance`, {
+      await axios.post(`https://trainee.software/attendance`, {
         userId: signedInUser.uid,
         eventId: event.eventId,
         isComing: isComingParameter,
@@ -147,7 +147,7 @@ const EventScreen = ({ route }) => {
 
     if (answered) {
       await axios.put(
-        `http://192.168.0.105:3000/attendance/${myAttendance.id}`,
+        `https://trainee.software/attendance/${myAttendance.id}`,
         {
           isComing: false,
           date: dateString,
@@ -155,7 +155,7 @@ const EventScreen = ({ route }) => {
         }
       );
     } else {
-      await axios.post(`http://192.168.0.105:3000/attendance`, {
+      await axios.post(`https://trainee.software/attendance`, {
         userId: signedInUser.uid,
         eventId: event.eventId,
         isComing: false,

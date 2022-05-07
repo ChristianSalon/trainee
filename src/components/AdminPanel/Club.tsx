@@ -17,7 +17,7 @@ const Club: React.FC<Props> = ({ club }) => {
 
   const deleteClub = () => {
     axios
-      .delete(`http://192.168.0.105:3000/admin/clubs/${club.clubId}`)
+      .delete(`https://trainee.software/admin/clubs/${club.clubId}`)
       .then((response) => {
         console.log(response);
         db.collection("clubs").doc(club.clubId).delete();

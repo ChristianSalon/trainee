@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import { Payment, StatusBar } from "../components";
 import { RefreshControl } from "react-native";
 import { useTeam } from "../hooks";
+import { useStripe } from "@stripe/stripe-react-native";
 
 const PaymentScreen = () => {
   const [payments, setPayments] = useState([]);
@@ -13,9 +14,10 @@ const PaymentScreen = () => {
 
   const getPayments = async () => {
     const results = await axios.get(
-      `http://192.168.0.105:3000/payments/team/${team.teamId}/user/${auth.currentUser.uid}`
+      `https://trainee.software/payments/team/${team.teamId}/user/${auth.currentUser.uid}`
     );
     setPayments(results.data);
+    console.log("hfjisvisfvi");
   };
 
   useEffect(() => {
@@ -28,7 +30,9 @@ const PaymentScreen = () => {
       <Box flex="1">
         <FlatList
           data={payments}
-          renderItem={({ item }) => <Payment payment={item} />}
+          renderItem={({ item }) => (
+            <Payment payment={item} onRefresh={getPayments} />
+          )}
           keyExtractor={(item) => item.paymentId.toString()}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={getPayments} />

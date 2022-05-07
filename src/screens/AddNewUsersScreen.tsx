@@ -24,7 +24,7 @@ const AddNewUsersScreen = ({ route }) => {
   const getUsers = async (text: string) => {
     setSearch(text);
     const results = await axios.get(
-      `http://192.168.0.105:3000/users/team/${team.teamId}/${text}`
+      `https://trainee.software/users/team/${team.teamId}/${text}`
     );
     setUsers(results.data);
   };

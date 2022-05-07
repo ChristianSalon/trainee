@@ -42,7 +42,7 @@ const EditPaymentScreen = ({ route }) => {
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/teams/club/${club.clubId}`
+        `https://trainee.software/teams/club/${club.clubId}`
       );
       let data: SelectModalInputProps[] = [];
       results.data.forEach((team) => {
@@ -63,7 +63,7 @@ const EditPaymentScreen = ({ route }) => {
 
   const editPayment = async (values: formValues) => {
     await axios.put(
-      `http://192.168.0.105:3000/admin/payments/${payment.paymentId}`,
+      `https://trainee.software/admin/payments/${payment.paymentId}`,
       {
         paymentId: payment.paymentId,
         teamIds: values.teams.join(","),

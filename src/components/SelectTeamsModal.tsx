@@ -26,7 +26,7 @@ const SelectTeamsModal = ({
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `http://192.168.0.105:3000/admin/payments/teams/${auth.currentUser.uid}`
+        `https://trainee.software/admin/payments/teams/${auth.currentUser.uid}`
       );
       setTeams(results.data);
       setIsLoading(false);

@@ -45,7 +45,7 @@ const CreateNewClubScreen = ({ navigation }) => {
 
     ref.getDownloadURL().then(async (url) => {
       await axios.post(
-        `http://192.168.0.105:3000/admin/clubs/${signedInUser.uid}`,
+        `https://trainee.software/admin/clubs/${signedInUser.uid}`,
         {
           clubId: docRef.id,
           name: clubName,
@@ -60,7 +60,7 @@ const CreateNewClubScreen = ({ navigation }) => {
         coaches: [],
         members: [],
       });
-      await axios.post(`http://192.168.0.105:3000/payments/accounts`, {
+      await axios.post(`https://trainee.software/payments/accounts`, {
         email: auth.currentUser.email,
         clubId: docRef.id,
         businessName: clubName,
