@@ -17,12 +17,17 @@ import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
+interface FormValues {
+  teamName: string;
+}
 
 const EditTeamScreen = ({ route }) => {
   const { team } = route.params;
   const navigation = useNavigation();
   const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
-  const [teamName, setTeamName] = useState(team.name);
   const [clubs, setClubs] = useState([]);
   const signedInUser = auth.currentUser;
 
@@ -36,7 +41,7 @@ const EditTeamScreen = ({ route }) => {
     getClubs();
   }, []);
 
-  const save = async () => {
+  const save = async (values: FormValues) => {
     const docRef = db.collection("teams").doc(team.teamId);
 
     if (selectedPhotoURI !== "") {
@@ -61,13 +66,13 @@ const EditTeamScreen = ({ route }) => {
       ref.getDownloadURL().then((url) => {
         axios
           .put(`https://trainee.software/admin/teams/${team.teamId}`, {
-            name: teamName,
+            name: values.teamName,
             photoURL: url,
           })
           .then(() => {
             docRef.set(
               {
-                name: teamName,
+                name: values.teamName,
                 photoURL: url,
               },
               { merge: true }
@@ -78,13 +83,13 @@ const EditTeamScreen = ({ route }) => {
     } else {
       axios
         .put(`https://trainee.software/admin/teams/${team.teamId}`, {
-          name: teamName,
+          name: values.teamName,
           photoURL: team.photoURL,
         })
         .then(() => {
           docRef.set(
             {
-              name: teamName,
+              name: values.teamName,
               photoURL: team.photoURL,
             },
             { merge: true }
@@ -114,56 +119,84 @@ const EditTeamScreen = ({ route }) => {
     setSelectedPhotoURI(result.uri);
   };
 
+  const schema = Yup.object().shape({
+    teamName: Yup.string().required("Team name is required"),
+  });
+
   return (
-    <Box
-      w="full"
-      flex="1"
-      alignItems="center"
-      p="20px"
-      bg={useColorModeValue(undefined, "dark.50")}
+    <Formik
+      initialValues={{
+        teamName: team.name,
+      }}
+      validationSchema={schema}
+      onSubmit={(values) => save(values)}
     >
-      <VStack space="2" alignItems="center" mb="7">
-        {selectedPhotoURI.length > 0 ? (
-          <Avatar
-            bg="transparent"
-            size="xl"
-            source={{ uri: selectedPhotoURI }}
-          />
-        ) : (
-          <Avatar bg="transparent" size="xl" source={{ uri: team.photoURL }} />
-        )}
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          onPress={choosePhoto}
-          rounded="xl"
-          _text={{ color: "black" }}
-        >
-          Choose photo
-        </Button>
-      </VStack>
-      <VStack space="3" flex="1" w="full">
-        <Input
-          variant="outline"
+      {({ handleChange, handleSubmit, values, errors, touched }) => (
+        <Box
           w="full"
-          placeholder="Team name"
-          onChangeText={(text) => setTeamName(text)}
-          value={teamName}
-        />
-        <Box flex="1" />
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          w="full"
-          onPress={() => navigation.navigate("Manage Users", { team })}
+          flex="1"
+          alignItems="center"
+          p="20px"
+          bg={useColorModeValue(undefined, "dark.50")}
         >
-          Manage Users
-        </Button>
-        <Button variant="solid" colorScheme="primary" w="full" onPress={save}>
-          Save
-        </Button>
-      </VStack>
-    </Box>
+          <VStack space="2" alignItems="center" mb="7">
+            {selectedPhotoURI.length > 0 ? (
+              <Avatar
+                bg="transparent"
+                size="xl"
+                source={{ uri: selectedPhotoURI }}
+              />
+            ) : (
+              <Avatar
+                bg="transparent"
+                size="xl"
+                source={{ uri: team.photoURL }}
+              />
+            )}
+            <Button
+              variant={useColorModeValue("subtle", "solid")}
+              colorScheme="gray"
+              onPress={choosePhoto}
+              rounded="xl"
+              _text={{ color: "black" }}
+            >
+              Choose photo
+            </Button>
+          </VStack>
+          <VStack space="3" flex="1" w="full">
+            <Input
+              variant="outline"
+              w="full"
+              placeholder="Team name"
+              onChangeText={handleChange("teamName")}
+              value={values.teamName}
+            />
+            {errors.teamName && touched.teamName ? (
+              <Text color="red.600" fontSize="xs">
+                * {errors.teamName}
+              </Text>
+            ) : null}
+            <Box flex="1" />
+            <Button
+              variant={useColorModeValue("subtle", "solid")}
+              colorScheme="gray"
+              w="full"
+              onPress={() => navigation.navigate("Manage Users", { team })}
+            >
+              Manage Users
+            </Button>
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              w="full"
+              onPress={() => handleSubmit()}
+            >
+              Save
+            </Button>
+          </VStack>
+        </Box>
+      )}
+    </Formik>
   );
 };
 

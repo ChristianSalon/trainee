@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, HStack, VStack, Avatar, Text } from "native-base";
+import { Box, HStack, VStack, Avatar, Text, Heading } from "native-base";
 import { Feather } from "@expo/vector-icons";
 import firebase from "firebase";
 import { useTeam } from "../hooks";
@@ -50,6 +50,9 @@ const Attendance: React.FC<Props> = ({ attendance }) => {
         </HStack>
         {roles.isManager && attendance.excuseNote && (
           <Box p="2" rounded="md" bg="red.200">
+            <Heading color="red.700" size="xs">
+              Excuse Note
+            </Heading>
             <Text color="red.700">{attendance.excuseNote}</Text>
           </Box>
         )}

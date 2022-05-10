@@ -134,17 +134,18 @@ const ChatScreen = () => {
             keyExtractor={(item) => item.data.id}
             showsVerticalScrollIndicator={false}
           />
-          <Pressable onPress={sendTextMessage}>
-            <Box w="100%" h="60px" px="15px" py="10px">
-              <HStack>
-                <Input
-                  value={input}
-                  onChangeText={(text) => setInput(text)}
-                  flex="1"
-                  mr="20px"
-                  variant="rounded"
-                  placeholder="Aa"
-                />
+          <Box w="100%" h="60px" px="15px" py="10px" justifyContent="center">
+            <HStack>
+              <Input
+                value={input}
+                onChangeText={(text) => setInput(text)}
+                h="40px"
+                flex="1"
+                mr="20px"
+                variant="rounded"
+                placeholder="Aa"
+              />
+              <Pressable onPress={sendTextMessage}>
                 <Box bg="primary.500" w="40px" h="40px" borderRadius="40px">
                   <Center flex="1">
                     {input.length > 0 ? (
@@ -154,9 +155,9 @@ const ChatScreen = () => {
                     )}
                   </Center>
                 </Box>
-              </HStack>
-            </Box>
-          </Pressable>
+              </Pressable>
+            </HStack>
+          </Box>
         </KeyboardAvoidingView>
       </Box>
       <ChatActionSheet isOpen={isOpen} onOpen={onOpen} onClose={onClose} />

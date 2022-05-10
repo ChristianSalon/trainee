@@ -48,7 +48,7 @@ const DTPicker = ({ title, date, setDate }) => {
         flexDirection="row"
         justifyContent="space-between"
         alignItems="center"
-        borderColor={useColorModeValue("gray.200", "gray.500")}
+        borderColor={useColorModeValue("gray.300", "gray.700")}
         borderWidth="1"
       >
         <Pressable fontSize="sm" onPress={showDatePicker}>

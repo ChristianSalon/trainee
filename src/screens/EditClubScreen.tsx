@@ -18,6 +18,12 @@ import { storage, db, auth } from "../firebase";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { Club, MysqlBoolean } from "../types";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
+interface FormValues {
+  clubName: string;
+}
 
 interface Props {
   club: Club;
@@ -27,12 +33,11 @@ const EditClubScreen = ({ route }) => {
   const { club }: Props = route.params;
   const navigation = useNavigation();
   const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
-  const [clubName, setClubName] = useState(club.name);
   const signedInUser = auth.currentUser;
 
   console.log(club);
 
-  const save = async () => {
+  const save = async (values: FormValues) => {
     const docRef = db.collection("clubs").doc(club.clubId);
 
     if (selectedPhotoURI !== "") {
@@ -57,13 +62,13 @@ const EditClubScreen = ({ route }) => {
       ref.getDownloadURL().then((url) => {
         axios
           .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
-            name: clubName,
+            name: values.clubName,
             photoURL: url,
           })
           .then(() => {
             docRef.set(
               {
-                name: clubName,
+                name: values.clubName,
                 photoURL: url,
               },
               { merge: true }
@@ -74,13 +79,13 @@ const EditClubScreen = ({ route }) => {
     } else {
       axios
         .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
-          name: clubName,
+          name: values.clubName,
           photoURL: club.photoURL,
         })
         .then(() => {
           docRef.set(
             {
-              name: clubName,
+              name: values.clubName,
               photoURL: club.photoURL,
             },
             { merge: true }
@@ -95,7 +100,7 @@ const EditClubScreen = ({ route }) => {
       ? await axios.post(`https://trainee.software/payments/accounts`, {
           email: auth.currentUser.email,
           clubId: club.clubId,
-          businessName: clubName,
+          businessName: club.name,
         })
       : await axios.get(
           `https://trainee.software/payments/accountLinks/${club.accountId}`
@@ -127,72 +132,100 @@ const EditClubScreen = ({ route }) => {
       return;
     }
 
-    console.log(result);
     setSelectedPhotoURI(result.uri);
-    console.log(selectedPhotoURI);
   };
 
+  const schema = Yup.object().shape({
+    clubName: Yup.string().required("Club name is required"),
+  });
+
   return (
-    <Box
-      w="full"
-      flex="1"
-      alignItems="center"
-      p="20px"
-      bg={useColorModeValue(undefined, "dark.50")}
+    <Formik
+      initialValues={{
+        clubName: club.name,
+      }}
+      validationSchema={schema}
+      onSubmit={(values) => save(values)}
     >
-      <VStack space="2" alignItems="center" mb="7">
-        {selectedPhotoURI.length > 0 ? (
-          <Avatar
-            bg="transparent"
-            size="xl"
-            source={{ uri: selectedPhotoURI }}
-          />
-        ) : (
-          <Avatar bg="transparent" size="xl" source={{ uri: club.photoURL }} />
-        )}
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          onPress={choosePhoto}
-          rounded="xl"
-          _text={{ color: "black" }}
-        >
-          Choose photo
-        </Button>
-      </VStack>
-      <Input
-        variant="outline"
-        w="full"
-        placeholder="Club name"
-        onChangeText={(text) => setClubName(text)}
-        value={clubName}
-      />
-      <Box flex="1" />
-      {club.isAccountSetUp === MysqlBoolean.False ? (
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
+      {({ handleChange, handleSubmit, values, errors, touched }) => (
+        <Box
           w="full"
-          onPress={setupPayments}
-          mb="2"
+          flex="1"
+          alignItems="center"
+          p="20px"
+          bg={useColorModeValue(undefined, "dark.50")}
         >
-          Setup Payments
-        </Button>
-      ) : (
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          w="full"
-          onPress={goToDashboard}
-          mb="2"
-        >
-          Go To Dashboard
-        </Button>
+          <VStack space="2" alignItems="center" mb="7">
+            {selectedPhotoURI.length > 0 ? (
+              <Avatar
+                bg="transparent"
+                size="xl"
+                source={{ uri: selectedPhotoURI }}
+              />
+            ) : (
+              <Avatar
+                bg="transparent"
+                size="xl"
+                source={{ uri: club.photoURL }}
+              />
+            )}
+            <Button
+              variant={useColorModeValue("subtle", "solid")}
+              colorScheme="gray"
+              onPress={choosePhoto}
+              rounded="xl"
+              _text={{ color: "black" }}
+            >
+              Choose photo
+            </Button>
+          </VStack>
+          <VStack space="3" flex="1" w="full">
+            <Input
+              variant="outline"
+              w="full"
+              placeholder="Club name"
+              onChangeText={handleChange("clubName")}
+              value={values.clubName}
+            />
+            {errors.clubName && touched.clubName ? (
+              <Text color="red.600" fontSize="xs">
+                * {errors.clubName}
+              </Text>
+            ) : null}
+            <Box flex="1" />
+            {club.isAccountSetUp === MysqlBoolean.False ? (
+              <Button
+                variant={useColorModeValue("subtle", "solid")}
+                colorScheme="gray"
+                w="full"
+                onPress={setupPayments}
+                mb="2"
+              >
+                Setup Payments
+              </Button>
+            ) : (
+              <Button
+                variant={useColorModeValue("subtle", "solid")}
+                colorScheme="gray"
+                w="full"
+                onPress={goToDashboard}
+                mb="2"
+              >
+                Go To Dashboard
+              </Button>
+            )}
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              w="full"
+              onPress={() => handleSubmit()}
+            >
+              Save
+            </Button>
+          </VStack>
+        </Box>
       )}
-      <Button variant="solid" colorScheme="primary" w="full" onPress={save}>
-        Save
-      </Button>
-    </Box>
+    </Formik>
   );
 };
 

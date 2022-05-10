@@ -93,6 +93,13 @@ const EventsScreen = () => {
                     theme.colors.dark[50]
                   ),
                 }}
+                renderEmptyData={() => {
+                  return (
+                    <Box flex="1" justifyContent="center" alignItems="center">
+                      <Text>No events for this day</Text>
+                    </Box>
+                  );
+                }}
               />
               {(roles.isCoach || roles.isManager) && (
                 <Fab

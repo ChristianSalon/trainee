@@ -54,11 +54,11 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
 
     const docRef = db
       .collection("teams")
-      .doc(team.id)
+      .doc(team.teamId)
       .collection("messages")
       .doc();
 
-    const ref = storage.ref().child(team.id + "/images/" + docRef.id);
+    const ref = storage.ref().child(team.teamId + "/images/" + docRef.id);
     await ref.put(blob);
     blob.close();
 
@@ -114,11 +114,11 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
 
     const docRef = db
       .collection("teams")
-      .doc(team.id)
+      .doc(team.teamId)
       .collection("messages")
       .doc();
 
-    const ref = storage.ref().child(team.id + "/videos/" + docRef.id);
+    const ref = storage.ref().child(team.teamId + "/videos/" + docRef.id);
     await ref.put(blob);
     blob.close();
 
@@ -181,11 +181,11 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
 
     const docRef = db
       .collection("teams")
-      .doc(team.id)
+      .doc(team.teamId)
       .collection("messages")
       .doc();
 
-    const ref = storage.ref().child(team.id + "/audio/" + docRef.id);
+    const ref = storage.ref().child(team.teamId + "/audio/" + docRef.id);
     await ref.put(blob);
     blob.close();
 

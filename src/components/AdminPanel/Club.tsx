@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, HStack, Avatar, Text, IconButton, Pressable } from "native-base";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
@@ -6,6 +6,7 @@ import { db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { useClub } from "../../hooks";
 import { Club as ClubProps } from "../../types";
+import { DeleteModal } from "..";
 
 interface Props {
   club: ClubProps;
@@ -14,6 +15,7 @@ interface Props {
 const Club: React.FC<Props> = ({ club }) => {
   const navigation = useNavigation();
   const { setClub } = useClub();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deleteClub = () => {
     axios
@@ -21,14 +23,17 @@ const Club: React.FC<Props> = ({ club }) => {
       .then((response) => {
         console.log(response);
         db.collection("clubs").doc(club.clubId).delete();
-        db.collection("teams")
+        /*db.collection("teams")
           .get()
           .where("clubId", "==", club.clubId)
           .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              doc.delete();
-            });
-          });
+            if (querySnapshot !== undefined) {
+              querySnapshot.forEach((doc) => {
+                doc.delete();
+              });
+            }
+          });*/
+        setShowDeleteModal(false);
       });
   };
 
@@ -87,10 +92,18 @@ const Club: React.FC<Props> = ({ club }) => {
               size: "xs",
             }}
             colorScheme="red"
-            onPress={deleteClub}
+            onPress={() => setShowDeleteModal(true)}
           />
         </HStack>
       </HStack>
+      {showDeleteModal && (
+        <DeleteModal
+          showModal={showDeleteModal}
+          setShowModal={setShowDeleteModal}
+          onDelete={deleteClub}
+          headerText={"Delete Club"}
+        />
+      )}
     </Box>
   );
 };

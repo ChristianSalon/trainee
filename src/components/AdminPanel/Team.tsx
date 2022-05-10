@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, HStack, Avatar, Text, IconButton } from "native-base";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
+import { DeleteModal } from "..";
 
 interface Props {
   team: {
@@ -16,6 +17,7 @@ interface Props {
 
 const Team: React.FC<Props> = ({ team }) => {
   const navigation = useNavigation();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deleteTeam = () => {
     console.log(team);
@@ -24,6 +26,7 @@ const Team: React.FC<Props> = ({ team }) => {
       .then((response) => {
         console.log(response);
         db.collection("teams").doc(team.teamId).delete();
+        setShowDeleteModal(false);
       });
   };
 
@@ -61,10 +64,18 @@ const Team: React.FC<Props> = ({ team }) => {
               size: "xs",
             }}
             colorScheme="red"
-            onPress={deleteTeam}
+            onPress={() => setShowDeleteModal(true)}
           />
         </HStack>
       </HStack>
+      {showDeleteModal && (
+        <DeleteModal
+          showModal={showDeleteModal}
+          setShowModal={setShowDeleteModal}
+          onDelete={deleteTeam}
+          headerText={"Delete Team"}
+        />
+      )}
     </Box>
   );
 };

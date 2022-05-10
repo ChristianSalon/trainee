@@ -55,7 +55,7 @@ const SendedAudioMessage = ({ message }) => {
           {isPlaying ? (
             <Ionicons name="pause" size={24} color="white" />
           ) : (
-            <Entypo name="controller-play" size={24} color="white" />
+            <Ionicons name="play" size={24} color="white" />
           )}
         </Pressable>
       </HStack>

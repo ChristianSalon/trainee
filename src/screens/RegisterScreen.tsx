@@ -27,21 +27,22 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const defaultPhotoURL =
+    "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229";
+
   const register = () => {
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((authUser) => {
         authUser.user.updateProfile({
           displayName: name,
-          photoURL:
-            "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
+          photoURL: defaultPhotoURL,
         });
         authUser.user.sendEmailVerification();
         axios.post(`https://trainee.software/users`, {
           userId: authUser.user.uid,
           name: name,
-          photoURL:
-            "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229",
+          photoURL: defaultPhotoURL,
           email: email,
         });
         axios.post(`https://trainee.software/payments/customers`, {
@@ -94,7 +95,6 @@ const RegisterScreen = ({ navigation }) => {
               value={password}
               onChangeText={(text) => setPassword(text)}
               w="80%"
-              rounded="10"
               mb="30px"
               borderWidth="0"
               InputRightElement={

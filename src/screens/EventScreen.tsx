@@ -13,10 +13,11 @@ import {
   ZStack,
   Avatar,
   useColorModeValue,
+  Spinner,
 } from "native-base";
 import { MaterialCommunityIcons, Ionicons, Feather } from "@expo/vector-icons";
 import { theme } from "../themes";
-import { AttendanceProps, EventProps } from "../types";
+import { AttendanceProps, EventProps, MysqlBoolean } from "../types";
 import { auth, db } from "../firebase";
 import firebase from "firebase";
 import { useNavigation } from "@react-navigation/native";
@@ -31,6 +32,7 @@ const EventScreen = ({ route }) => {
   const [myAttendance, setMyAttendance] = useState({});
   const [excuseNote, setExcuseNote] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   let profilePhotos: ReactElement[] = [];
   const [profilePhotosState, setProfilePhotosState] = useState<ReactElement[]>(
     []
@@ -53,7 +55,7 @@ const EventScreen = ({ route }) => {
             excuseNote: a.excuseNote,
           });
           setAnswered(true);
-          setIsComing(a.isComing === 1 ? true : false);
+          setIsComing(a.isComing === MysqlBoolean.True ? true : false);
         }
         if (a.isComing && margin / 4 <= 10) {
           profilePhotos.push(
@@ -72,6 +74,7 @@ const EventScreen = ({ route }) => {
       setProfilePhotosState(profilePhotos);
     };
     getAttendance();
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -127,13 +130,14 @@ const EventScreen = ({ route }) => {
     } else if (answered && !isComingParameter) {
       setShowModal(true);
     } else if (isComingParameter) {
-      await axios.post(`https://trainee.software/attendance`, {
+      const resopnse = await axios.post(`https://trainee.software/attendance`, {
         userId: signedInUser.uid,
         eventId: event.eventId,
         isComing: isComingParameter,
         date: dateString,
-        excuseNote: null,
+        excuseNote: undefined,
       });
+      console.log(resopnse);
       setIsComing(isComingParameter);
       setAnswered(true);
     } else {
@@ -185,149 +189,173 @@ const EventScreen = ({ route }) => {
   return (
     <>
       <StatusBar style="light" />
-      <Box w="100%" h="40%" bg="primary.200" justifyContent="flex-end">
-        <Image
-          w="full"
-          h="full"
-          source={require("../assets/training_4.jpg")}
-          alt="Training photo."
-          resizeMode="cover"
-        />
-        <Heading
-          size="lg"
-          color="white"
-          position="absolute"
-          bottom="50px"
-          px="20px"
-          noOfLines={2}
-          isTruncated
-          style={{
-            textShadowRadius: 10,
-            textShadowColor: "gray",
-          }}
-        >
-          {event.name}
-        </Heading>
-      </Box>
-      {/*<Box
+      {isLoading ? (
+        <Box justifyContent="center" alignItems="center">
+          <Spinner size="lg" />
+        </Box>
+      ) : (
+        <>
+          <Box w="100%" h="40%" bg="primary.200" justifyContent="flex-end">
+            <Image
+              w="full"
+              h="full"
+              source={require("../assets/training_4.jpg")}
+              alt="Training photo."
+              resizeMode="cover"
+            />
+            <Heading
+              size="lg"
+              color="white"
+              position="absolute"
+              bottom="50px"
+              px="20px"
+              noOfLines={2}
+              isTruncated
+              style={{
+                textShadowRadius: 10,
+                textShadowColor: "gray",
+              }}
+            >
+              {event.name}
+            </Heading>
+          </Box>
+          {/*<Box
         w="100%"
         h="15px"
         bg="white"
         /*borderTopLeftRadius="15px"
         borderTopRightRadius="15px"
       />*/}
-      <ScrollView
-        _contentContainerStyle={{
-          w: "100%",
-          bg: "white",
-          px: "20px",
-          py: "30px",
-          bgColor: useColorModeValue(undefined, "dark.50"),
-        }}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        fadingEdgeLength={0}
-        bg={useColorModeValue(undefined, "dark.50")}
-      >
-        <VStack space="5">
-          <VStack space="2">
-            <Text fontSize="xs" color="coolGray.400" mb="1" letterSpacing="lg">
-              BASIC INFORMATION
-            </Text>
-            <HStack space="5" py="2">
-              <MaterialCommunityIcons name="calendar" size={22} color="gray" />
-              <Text fontSize="sm">{getEventInfoDates()}</Text>
-            </HStack>
-            <HStack space="5" py="2">
-              <Ionicons name="location-sharp" size={22} color="gray" />
-              <Text fontSize="sm">{event.location}</Text>
-            </HStack>
-            <HStack space="5" py="2">
-              <Ionicons name="person" size={22} color="gray" />
-              <Text fontSize="sm">{event.teamsString}</Text>
-            </HStack>
-          </VStack>
-          {event.details && (
-            <Box>
-              <Text
-                fontSize="xs"
-                color="coolGray.400"
-                mb="3"
-                letterSpacing="lg"
-              >
-                DETAILS
-              </Text>
-              <Text>{event.details}</Text>
-            </Box>
-          )}
-          <Box>
-            <Text fontSize="xs" color="coolGray.400" letterSpacing="lg" mb="3">
-              ATTENDANCE
-            </Text>
-            <HStack space="3">
-              <IconButton
-                colorScheme="green"
-                variant={isComing ? "solid" : "outline"}
-                borderRadius="full"
-                _icon={{
-                  as: Feather,
-                  name: "check",
-                  color: isComing ? "white" : "green.500",
-                }}
-                onPress={() => saveAttendance(true)}
-              />
-              <IconButton
-                colorScheme="red"
-                variant={!isComing && answered ? "solid" : "outline"}
-                borderRadius="full"
-                _icon={{
-                  as: Feather,
-                  name: "x",
-                  color: !isComing && answered ? "white" : "red.500",
-                }}
-                onPress={() => saveAttendance(false)}
-              />
-            </HStack>
-            {showModal && (
-              <TextInputModal
-                showModal={showModal}
-                setShowModal={setShowModal}
-                value={excuseNote}
-                onValueChange={setExcuseNote}
-                headerText={"Excuse Note"}
-                placeholder={"Your excuse"}
-                onSave={saveIsNotComingAttendance}
-              />
-            )}
-            <Box flexDirection="row" justifyContent="space-between" mt="4">
-              <ZStack reversed>
-                {profilePhotosState}
-                <Avatar bg="gray.300" size="xs">
-                  0
-                </Avatar>
-              </ZStack>
-              <Button
-                size="sm"
-                variant="link"
-                colorScheme="secondary"
-                onPress={() =>
-                  navigation.navigate("Attendance", { eventId: event.eventId })
-                }
-              >
-                See All
-              </Button>
-            </Box>
-          </Box>
-          <Heading
-            size="sm"
-            pt="2"
-            textAlign="center"
-            color={useColorModeValue("gray.300", "gray.700")}
+          <ScrollView
+            _contentContainerStyle={{
+              w: "100%",
+              bg: "white",
+              px: "20px",
+              py: "30px",
+              bgColor: useColorModeValue(undefined, "dark.50"),
+            }}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            fadingEdgeLength={0}
+            bg={useColorModeValue(undefined, "dark.50")}
           >
-            Powered by Trainee.
-          </Heading>
-        </VStack>
-      </ScrollView>
+            <VStack space="5">
+              <VStack space="2">
+                <Text
+                  fontSize="xs"
+                  color="coolGray.400"
+                  mb="1"
+                  letterSpacing="lg"
+                >
+                  BASIC INFORMATION
+                </Text>
+                <HStack space="5" py="2">
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={22}
+                    color="gray"
+                  />
+                  <Text fontSize="sm">{getEventInfoDates()}</Text>
+                </HStack>
+                <HStack space="5" py="2">
+                  <Ionicons name="location-sharp" size={22} color="gray" />
+                  <Text fontSize="sm">{event.location}</Text>
+                </HStack>
+                <HStack space="5" py="2">
+                  <Ionicons name="person" size={22} color="gray" />
+                  <Text fontSize="sm">{event.teamsString}</Text>
+                </HStack>
+              </VStack>
+              {event.details && (
+                <Box>
+                  <Text
+                    fontSize="xs"
+                    color="coolGray.400"
+                    mb="3"
+                    letterSpacing="lg"
+                  >
+                    DETAILS
+                  </Text>
+                  <Text>{event.details}</Text>
+                </Box>
+              )}
+              <Box>
+                <Text
+                  fontSize="xs"
+                  color="coolGray.400"
+                  letterSpacing="lg"
+                  mb="3"
+                >
+                  ATTENDANCE
+                </Text>
+                <HStack space="3">
+                  <IconButton
+                    colorScheme="green"
+                    variant={isComing ? "solid" : "outline"}
+                    borderRadius="full"
+                    _icon={{
+                      as: Feather,
+                      name: "check",
+                      color: isComing ? "white" : "green.500",
+                    }}
+                    onPress={() => saveAttendance(true)}
+                  />
+                  <IconButton
+                    colorScheme="red"
+                    variant={!isComing && answered ? "solid" : "outline"}
+                    borderRadius="full"
+                    _icon={{
+                      as: Feather,
+                      name: "x",
+                      color: !isComing && answered ? "white" : "red.500",
+                    }}
+                    onPress={() => saveAttendance(false)}
+                  />
+                </HStack>
+                {showModal && (
+                  <TextInputModal
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                    value={excuseNote}
+                    onValueChange={setExcuseNote}
+                    headerText={"Excuse Note"}
+                    placeholder={"Your excuse"}
+                    onSave={saveIsNotComingAttendance}
+                  />
+                )}
+                <Box flexDirection="row" justifyContent="space-between" mt="4">
+                  <ZStack reversed>
+                    {profilePhotosState}
+                    <Avatar bg="gray.300" size="xs">
+                      0
+                    </Avatar>
+                  </ZStack>
+                  <Button
+                    size="sm"
+                    variant="link"
+                    colorScheme="secondary"
+                    onPress={() =>
+                      navigation.navigate("Attendance", {
+                        eventId: event.eventId,
+                      })
+                    }
+                  >
+                    See All
+                  </Button>
+                </Box>
+              </Box>
+              <Heading
+                size="sm"
+                pt="2"
+                textAlign="center"
+                color={useColorModeValue("gray.300", "gray.700")}
+              >
+                Powered by Trainee.
+              </Heading>
+            </VStack>
+          </ScrollView>
+        </>
+      )}
     </>
   );
 };

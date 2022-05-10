@@ -15,15 +15,20 @@ import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 import axios from "axios";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
+interface FormValues {
+  clubName: string;
+}
 
 const CreateNewClubScreen = ({ navigation }) => {
   const [selectedPhotoURI, setSelectedPhotoURI] = useState(
     "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229"
   );
-  const [clubName, setClubName] = useState("");
   const signedInUser = auth.currentUser;
 
-  const createClub = async () => {
+  const createClub = async (values: FormValues) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -48,13 +53,13 @@ const CreateNewClubScreen = ({ navigation }) => {
         `https://trainee.software/admin/clubs/${signedInUser.uid}`,
         {
           clubId: docRef.id,
-          name: clubName,
+          name: values.clubName,
           photoURL: url,
         }
       );
       docRef.set({
         id: docRef.id,
-        name: clubName,
+        name: values.clubName,
         photoURL: url,
         managers: [signedInUser.uid],
         coaches: [],
@@ -63,7 +68,7 @@ const CreateNewClubScreen = ({ navigation }) => {
       await axios.post(`https://trainee.software/payments/accounts`, {
         email: auth.currentUser.email,
         clubId: docRef.id,
-        businessName: clubName,
+        businessName: values.clubName,
       });
       navigation.goBack();
     });
@@ -86,55 +91,72 @@ const CreateNewClubScreen = ({ navigation }) => {
       return;
     }
 
-    console.log(result);
     setSelectedPhotoURI(result.uri);
-    console.log(selectedPhotoURI);
   };
 
+  const schema = Yup.object().shape({
+    clubName: Yup.string().required("Club name is required"),
+  });
+
   return (
-    <Box
-      w="full"
-      flex="1"
-      alignItems="center"
-      p="20px"
-      bg={useColorModeValue(undefined, "dark.50")}
+    <Formik
+      initialValues={{
+        clubName: "",
+      }}
+      validationSchema={schema}
+      onSubmit={(values) => createClub(values)}
     >
-      <VStack space="2" alignItems="center" mb="7">
-        <Avatar
-          bg="transparent"
-          size="xl"
-          source={{ uri: selectedPhotoURI }}
-          key={selectedPhotoURI}
-        />
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          onPress={choosePhoto}
-          rounded="xl"
-          _text={{ color: "black" }}
-        >
-          Choose photo
-        </Button>
-      </VStack>
-      <VStack space="3" flex="1" w="full">
-        <Input
-          variant="outline"
+      {({ handleChange, handleSubmit, values, errors, touched }) => (
+        <Box
           w="full"
-          placeholder="Club name"
-          onChangeText={(text) => setClubName(text)}
-          value={clubName}
-        />
-        <Box flex="1" />
-        <Button
-          variant="solid"
-          colorScheme="primary"
-          w="full"
-          onPress={createClub}
+          flex="1"
+          alignItems="center"
+          p="20px"
+          bg={useColorModeValue(undefined, "dark.50")}
         >
-          Create Club
-        </Button>
-      </VStack>
-    </Box>
+          <VStack space="2" alignItems="center" mb="7">
+            <Avatar
+              bg="transparent"
+              size="xl"
+              source={{ uri: selectedPhotoURI }}
+              key={selectedPhotoURI}
+            />
+            <Button
+              variant={useColorModeValue("subtle", "solid")}
+              colorScheme="gray"
+              onPress={choosePhoto}
+              rounded="xl"
+              _text={{ color: "black" }}
+            >
+              Choose photo
+            </Button>
+          </VStack>
+          <VStack space="3" flex="1" w="full">
+            <Input
+              variant="outline"
+              w="full"
+              placeholder="Club name"
+              onChangeText={handleChange("clubName")}
+              value={values.clubName}
+            />
+            {errors.clubName && touched.clubName ? (
+              <Text color="red.600" fontSize="xs">
+                * {errors.clubName}
+              </Text>
+            ) : null}
+            <Box flex="1" />
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              w="full"
+              onPress={() => handleSubmit()}
+            >
+              Create Club
+            </Button>
+          </VStack>
+        </Box>
+      )}
+    </Formik>
   );
 };
 

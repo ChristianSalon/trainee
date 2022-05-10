@@ -62,7 +62,6 @@ const CreateNewPaymentScreen = ({ navigation }) => {
   }, []);
 
   const createPayment = async (values: formValues) => {
-    console.log(values);
     axios
       .post(`https://trainee.software/admin/payments`, {
         teamIds: values.teams.join(","),

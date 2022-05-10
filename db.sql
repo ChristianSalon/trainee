@@ -266,6 +266,10 @@ UPDATE payments_users AS pu
 	INNER JOIN users AS u ON pu.userId = u.userId
 	SET pu.settledAt = "2022-05-03"
 	WHERE u.customerId = "cus_LXmSwz1blH1MOK" AND pu.paymentId = 18;
+    
+UPDATE attendance 
+    SET isComing = false, date = "2022-05-07T15:20:00", excuseNote = "efgw" 
+    WHERE id = 5;
 
 /*
 SELECT c.club_id, c.name, c.photoURL FROM clubs as c INNER JOIN clubs_users as cu ON c.club_id = cu.club_id WHERE user_id = 1 AND role = "MANAGER";
@@ -416,7 +420,7 @@ DELIMITER $$
 
 drop trigger payments_teamsInserted;
 
-drop trigger if exists userInserted;
+/*drop trigger if exists userInserted;
 DELIMITER $$
 CREATE TRIGGER userInserted AFTER INSERT ON users
 FOR EACH ROW
@@ -426,7 +430,7 @@ END $$
 
 DELIMITER $$
 
-/*DELIMITER $$
+DELIMITER $$
 CREATE TRIGGER paymentInserted AFTER INSERT ON payments
 FOR EACH ROW
 BEGIN

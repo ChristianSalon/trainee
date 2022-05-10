@@ -18,16 +18,21 @@ import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 import axios from "axios";
 import { useClub } from "../hooks";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
+interface FormValues {
+  teamName: string;
+}
 
 const CreateNewTeamScreen = ({ navigation }) => {
   const { club } = useClub();
   const [selectedPhotoURI, setSelectedPhotoURI] = useState(
     "https://firebasestorage.googleapis.com/v0/b/trainee-app-1b59f.appspot.com/o/profilePhotos%2Fdefault_photo.png?alt=media&token=d2b3d2b6-8bda-4717-abbf-0796af602229"
   );
-  const [teamName, setTeamName] = useState("");
   const signedInUser = auth.currentUser;
 
-  const createTeam = async () => {
+  const createTeam = async (values: FormValues) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -52,14 +57,14 @@ const CreateNewTeamScreen = ({ navigation }) => {
         .post(`https://trainee.software/admin/teams/${signedInUser.uid}`, {
           teamId: docRef.id,
           clubId: club.clubId,
-          name: teamName,
+          name: values.teamName,
           photoURL: url,
         })
         .then(() => {
           docRef.set({
             teamId: docRef.id,
             clubId: club.clubId,
-            name: teamName,
+            name: values.teamName,
             photoURL: url,
           });
           navigation.goBack();
@@ -87,50 +92,69 @@ const CreateNewTeamScreen = ({ navigation }) => {
     setSelectedPhotoURI(result.uri);
   };
 
+  const schema = Yup.object().shape({
+    teamName: Yup.string().required("Team name is required"),
+  });
+
   return (
-    <Box
-      w="full"
-      flex="1"
-      alignItems="center"
-      p="20px"
-      bg={useColorModeValue(undefined, "dark.50")}
+    <Formik
+      initialValues={{
+        teamName: "",
+      }}
+      validationSchema={schema}
+      onSubmit={(values) => createTeam(values)}
     >
-      <VStack space="2" alignItems="center" mb="7">
-        <Avatar
-          bg="transparent"
-          size="xl"
-          source={{ uri: selectedPhotoURI }}
-          key={selectedPhotoURI}
-        />
-        <Button
-          variant={useColorModeValue("subtle", "solid")}
-          colorScheme="gray"
-          onPress={choosePhoto}
-          rounded="xl"
-          _text={{ color: "black" }}
-        >
-          Choose photo
-        </Button>
-      </VStack>
-      <VStack space="3" flex="1" w="full">
-        <Input
-          variant="outline"
+      {({ handleChange, handleSubmit, values, errors, touched }) => (
+        <Box
           w="full"
-          placeholder="Team name"
-          onChangeText={(text) => setTeamName(text)}
-          value={teamName}
-        />
-        <Box flex="1" />
-        <Button
-          variant="solid"
-          colorScheme="primary"
-          w="full"
-          onPress={createTeam}
+          flex="1"
+          alignItems="center"
+          p="20px"
+          bg={useColorModeValue(undefined, "dark.50")}
         >
-          Create Team
-        </Button>
-      </VStack>
-    </Box>
+          <VStack space="2" alignItems="center" mb="7">
+            <Avatar
+              bg="transparent"
+              size="xl"
+              source={{ uri: selectedPhotoURI }}
+              key={selectedPhotoURI}
+            />
+            <Button
+              variant={useColorModeValue("subtle", "solid")}
+              colorScheme="gray"
+              onPress={choosePhoto}
+              rounded="xl"
+              _text={{ color: "black" }}
+            >
+              Choose photo
+            </Button>
+          </VStack>
+          <VStack space="3" flex="1" w="full">
+            <Input
+              variant="outline"
+              w="full"
+              placeholder="Team name"
+              onChangeText={handleChange("teamName")}
+              value={values.teamName}
+            />
+            {errors.teamName && touched.teamName ? (
+              <Text color="red.600" fontSize="xs">
+                * {errors.teamName}
+              </Text>
+            ) : null}
+            <Box flex="1" />
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              w="full"
+              onPress={() => handleSubmit()}
+            >
+              Create Team
+            </Button>
+          </VStack>
+        </Box>
+      )}
+    </Formik>
   );
 };
 

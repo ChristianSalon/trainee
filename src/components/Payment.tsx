@@ -92,7 +92,6 @@ const Payment: React.FC<Props> = ({ payment, onRefresh }) => {
   const openPaymentSheet = async () => {
     await initializePaymentSheet();
     const { error } = await presentPaymentSheet();
-    //const stripe = useStripe();
 
     if (error) {
       toast.show({

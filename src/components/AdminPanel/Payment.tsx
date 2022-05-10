@@ -11,10 +11,11 @@ import {
   useColorModeValue,
   VStack,
 } from "native-base";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Payment as PaymentProps } from "../../types";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
+import { DeleteModal } from "..";
 
 interface Props {
   payment: PaymentProps;
@@ -25,14 +26,12 @@ const Payment: React.FC<Props> = ({ payment }) => {
   const dueDate = new Date(payment.dueDate);
   const bgColor =
     dueDate.getTime() < Date.now() - 86400000 ? "red.200" : "green.200";
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const onClose = () => setIsDialogOpen(false);
-  const cancelRef = useRef(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deletePayment = () => {
     axios
       .delete(`https://trainee.software/admin/payments/${payment.paymentId}`)
-      .then(() => onClose());
+      .then(() => setShowDeleteModal(false));
   };
 
   return (
@@ -75,37 +74,18 @@ const Payment: React.FC<Props> = ({ payment }) => {
               size: "xs",
             }}
             colorScheme="red"
-            onPress={() => setIsDialogOpen(!isDialogOpen)}
+            onPress={() => setShowDeleteModal(true)}
           />
         </VStack>
       </HStack>
-      <AlertDialog
-        leastDestructiveRef={cancelRef}
-        isOpen={isDialogOpen}
-        onClose={onClose}
-      >
-        <AlertDialog.Content>
-          <AlertDialog.Header>Delete Payment</AlertDialog.Header>
-          <AlertDialog.Body>
-            This will delete the selected payment! Are you sure?
-          </AlertDialog.Body>
-          <AlertDialog.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="link"
-                colorScheme="gray"
-                onPress={onClose}
-                ref={cancelRef}
-              >
-                Cancel
-              </Button>
-              <Button onPress={deletePayment} colorScheme="red">
-                Delete
-              </Button>
-            </Button.Group>
-          </AlertDialog.Footer>
-        </AlertDialog.Content>
-      </AlertDialog>
+      {showDeleteModal && (
+        <DeleteModal
+          showModal={showDeleteModal}
+          setShowModal={setShowDeleteModal}
+          onDelete={deletePayment}
+          headerText={"Delete Payment"}
+        />
+      )}
     </Box>
   );
 };

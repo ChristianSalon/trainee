@@ -27,6 +27,7 @@ import TextInputModal from "./TextInputModal";
 import SelectOneModal from "./SelectOneModal";
 import StatusBar from "./StatusBar";
 import ThemeToggle from "./ThemeToggle";
+import DeleteModal from "./DeleteModal";
 
 export {
   Team,
@@ -58,4 +59,5 @@ export {
   SelectOneModal,
   StatusBar,
   ThemeToggle,
+  DeleteModal,
 };

@@ -36,7 +36,7 @@ const SelectModalInput: React.FC<Props> = ({
       flexDirection="row"
       justifyContent="space-between"
       alignItems="center"
-      borderColor={useColorModeValue("gray.200", "gray.500")}
+      borderColor={useColorModeValue("gray.300", "gray.700")}
       borderWidth="1"
       fontSize="sm"
       onPress={() => setShowModal(true)}

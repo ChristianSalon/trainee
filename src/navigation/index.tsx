@@ -411,6 +411,9 @@ function EventsStackScreen() {
           headerStyle: {
             backgroundColor: "transparent",
           },
+          headerTitleStyle: { color: "#fff" },
+          headerTintColor: "#fff",
+          headerShadowVisible: false,
           headerTransparent: true,
           title: "",
         }}
@@ -484,9 +487,6 @@ export default function Navigation() {
     prefixes: [Linking.createURL("/"), "trainee://", "http://localhost:19002"],
   };
 
-  /*const { colorMode } = useColorMode();
-  const colorScheme = useColorScheme();
-  console.log(`${colorMode} - ${colorScheme} - ${Appearance.getColorScheme()}`);*/
   const { persistedTheme } = useTheme();
   const [navigationContainerTheme, setNavigationContainerTheme] = useState<{
     dark: boolean;
@@ -501,7 +501,6 @@ export default function Navigation() {
   }>({ ...DefaultTheme });
 
   useEffect(() => {
-    console.log("Persisted Theme - " + persistedTheme);
     setNavigationContainerTheme(
       persistedTheme === "light"
         ? {
@@ -522,15 +521,6 @@ export default function Navigation() {
           }
     );
   }, [persistedTheme]);
-
-  /*const navigationContainerThemee = {
-    ...DarkTheme,
-    dark: true,
-    colors: {
-      ...DarkTheme.colors,
-      background: theme.colors.dark[50],
-    },
-  };*/
 
   return (
     <StripeProvider
