@@ -17,23 +17,25 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../themes";
 import { auth } from "../firebase";
 import { Platform } from "react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const register = () => {
     navigation.navigate("Register");
   };
 
-  const login = () => {
-    auth.signInWithEmailAndPassword(email, password).catch((error) => {
-      alert(error.message);
-    });
+  const login = (values: FormValues) => {
+    auth
+      .signInWithEmailAndPassword(values.email, values.password)
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
-  const reset = () => {
+  const reset = (email: string) => {
     auth
       .sendPasswordResetEmail(email)
       .then(() => {
@@ -53,77 +55,111 @@ const LoginScreen = ({ navigation }) => {
     return unsubscribe;
   }, []);
 
+  const schema = Yup.object({
+    email: Yup.string()
+      .email("Must be a valid email")
+      .max(255)
+      .required("Email is required"),
+    password: Yup.string()
+      .min(8, "Password must contain at least 8 characters")
+      .required("Password is required"),
+  });
+
+  type FormValues = Yup.InferType<typeof schema>;
+
   return (
     <>
       <StatusBar style={"light"} />
-      <Box
-        flex="1"
-        justifyContent="center"
-        _light={{ bg: "white" }}
-        _dark={{ bg: "dark.50" }}
+      <Formik
+        initialValues={{
+          email: "",
+          password: "",
+        }}
+        validationSchema={schema}
+        onSubmit={(values) => login(values)}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <VStack justifyContent="center" alignItems="center">
-            <Text mb="30px" fontSize={24}>
-              Log Into My <Heading>trainee.</Heading>
-            </Text>
-            <Input
-              variant="filled"
-              placeholder="Email"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              w="80%"
-              mb="20px"
-              borderWidth="0"
-            />
-            <Input
-              variant="filled"
-              placeholder="Password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              w="80%"
-              mb="30px"
-              borderWidth="0"
-              InputRightElement={
-                <Icon
-                  size={5}
-                  mr="2"
-                  onPress={() => setShowPassword(!showPassword)}
-                  as={
-                    <MaterialIcons
-                      name={showPassword ? "visibility" : "visibility-off"}
+        {({ handleChange, handleSubmit, values, errors, touched }) => (
+          <Box
+            flex="1"
+            justifyContent="center"
+            _light={{ bg: "white" }}
+            _dark={{ bg: "dark.50" }}
+            px="30px"
+          >
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+              <VStack justifyContent="center" alignItems="center" space="3">
+                <Text mb="10px" fontSize={24}>
+                  Log Into My <Heading>trainee.</Heading>
+                </Text>
+                <Input
+                  variant="filled"
+                  placeholder="Email"
+                  value={values.email}
+                  onChangeText={handleChange("email")}
+                  borderWidth="0"
+                />
+                {errors.email && touched.email ? (
+                  <Text color="red.600" fontSize="xs" alignSelf="flex-start">
+                    * {errors.email}
+                  </Text>
+                ) : null}
+                <Input
+                  variant="filled"
+                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={values.password}
+                  onChangeText={handleChange("password")}
+                  borderWidth="0"
+                  InputRightElement={
+                    <Icon
+                      size={5}
+                      mr="2"
+                      onPress={() => setShowPassword(!showPassword)}
+                      as={
+                        <MaterialIcons
+                          name={showPassword ? "visibility" : "visibility-off"}
+                        />
+                      }
                     />
                   }
                 />
-              }
-            />
-            <Button mb="15px" size="md" w="80%" onPress={login}>
-              Log In
-            </Button>
-            <Button
-              variant="outline"
-              mb="10px"
-              w="80%"
-              colorScheme="gray"
-              onPress={register}
-            >
-              Create Account
-            </Button>
-            <Button
-              size="sm"
-              variant="link"
-              w="80%"
-              _text={{ underline: true, color: "dark.500" }}
-              onPress={() => reset()}
-            >
-              I’ve forgotten my password
-            </Button>
-          </VStack>
-        </KeyboardAvoidingView>
-      </Box>
+                {errors.password && touched.password ? (
+                  <Text color="red.600" fontSize="xs" alignSelf="flex-start">
+                    * {errors.password}
+                  </Text>
+                ) : null}
+                <Button
+                  mt="10px"
+                  size="md"
+                  w="full"
+                  onPress={() => handleSubmit()}
+                >
+                  Log In
+                </Button>
+                <Button
+                  variant="outline"
+                  w="full"
+                  colorScheme="gray"
+                  onPress={register}
+                >
+                  Create Account
+                </Button>
+                <Button
+                  size="sm"
+                  variant="link"
+                  w=""
+                  _text={{ underline: true, color: "dark.500" }}
+                  onPress={() => reset(values.email)}
+                >
+                  I’ve forgotten my password
+                </Button>
+              </VStack>
+            </KeyboardAvoidingView>
+          </Box>
+        )}
+      </Formik>
     </>
   );
 };

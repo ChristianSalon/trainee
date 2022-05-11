@@ -38,6 +38,12 @@ const HomeScreen = ({ navigation }) => {
     setTeams(results.data);
   };
 
+  const getTeamsOnRefresh = async () => {
+    setRefreshing(true);
+    await getTeams();
+    setRefreshing(false);
+  };
+
   const signOut = () => {
     auth.signOut().then(() => {
       navigation.reset({
@@ -78,7 +84,10 @@ const HomeScreen = ({ navigation }) => {
             renderItem={({ item }) => <Team team={item} />}
             keyExtractor={(item) => item.teamId}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={getTeams} />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={getTeamsOnRefresh}
+              />
             }
           />
           <Fab
