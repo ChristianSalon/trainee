@@ -15,7 +15,7 @@ import { theme } from "../themes";
 import { AntDesign } from "@expo/vector-icons";
 import { Payment, Team } from "../components/AdminPanel";
 import { useClub } from "../hooks";
-import { MysqlBoolean } from "../types";
+import { MysqlBoolean, Payment as PaymentProps } from "../types";
 
 const AdminPanelPaymentsScreen = ({ navigation }) => {
   const { club } = useClub();
@@ -36,16 +36,33 @@ const AdminPanelPaymentsScreen = ({ navigation }) => {
 
   const onPress = () => {
     club.isAccountSetUp === MysqlBoolean.True
-      ? navigation.navigate("Create New Payment")
+      ? navigation.navigate("Create New Payment", { onCreate })
       : toast.show({ description: "You need to set up Stripe" });
+  };
+
+  const onDelete = (paymentId: number) => {
+    const filteredData = payments.filter(
+      (payment: PaymentProps) => payment.paymentId !== paymentId
+    );
+    setPayments(filteredData);
+  };
+
+  const onEdit = async () => {
+    await getPayments();
+  };
+
+  const onCreate = async () => {
+    await getPayments();
   };
 
   return (
     <>
       <FlatList
         data={payments}
-        renderItem={({ item }) => <Payment payment={item} />}
-        keyExtractor={(item) => item.paymentId}
+        renderItem={({ item }) => (
+          <Payment payment={item} onEdit={onEdit} onDelete={onDelete} />
+        )}
+        keyExtractor={(item: PaymentProps) => item.paymentId.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={getPayments} />
         }

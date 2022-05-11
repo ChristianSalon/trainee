@@ -11,6 +11,7 @@ import {
   Button,
   ScrollView,
   useColorModeValue,
+  useToast,
 } from "native-base";
 import * as Yup from "yup";
 import { DatePicker, SelectModalInput, SelectTeamsInput } from "../components";
@@ -29,11 +30,13 @@ interface formValues {
 
 interface Props {
   payment: Payment;
+  onEdit: () => Promise<void>;
 }
 
 const EditPaymentScreen = ({ route }) => {
-  const { payment }: Props = route.params;
+  const { payment, onEdit }: Props = route.params;
   const navigation = useNavigation();
+  const toast = useToast();
   const { club } = useClub();
   const [dueDate, setDueDate] = useState(new Date(payment.dueDate));
   const [teams, setTeams] = useState<SelectModalInputProps[]>([]);
@@ -62,7 +65,7 @@ const EditPaymentScreen = ({ route }) => {
   };
 
   const editPayment = async (values: formValues) => {
-    await axios.put(
+    const response = await axios.put(
       `https://trainee.software/admin/payments/${payment.paymentId}`,
       {
         paymentId: payment.paymentId,
@@ -74,7 +77,13 @@ const EditPaymentScreen = ({ route }) => {
         dueDate: dueDate.toISOString().split("T")[0],
       }
     );
-    navigation.goBack();
+    if (response.status === 200) {
+      toast.show({ description: "Payment updated." });
+      await onEdit();
+      navigation.goBack();
+    } else {
+      toast.show({ description: "Payment update failed." });
+    }
   };
 
   const schema = Yup.object().shape({

@@ -9,6 +9,7 @@ import {
   Pressable,
   Text,
   useColorModeValue,
+  useToast,
   VStack,
 } from "native-base";
 import React, { useState } from "react";
@@ -19,19 +20,31 @@ import { DeleteModal } from "..";
 
 interface Props {
   payment: PaymentProps;
+  onDelete: (paymentId: number) => void;
+  onEdit: () => Promise<void>;
 }
 
-const Payment: React.FC<Props> = ({ payment }) => {
+const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
   const navigation = useNavigation();
+  const toast = useToast();
   const dueDate = new Date(payment.dueDate);
   const bgColor =
-    dueDate.getTime() < Date.now() - 86400000 ? "red.200" : "green.200";
+    dueDate.getTime() < Date.now() - 86400000
+      ? useColorModeValue("red.200", "red.400")
+      : useColorModeValue("green.200", "green.400");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const deletePayment = () => {
-    axios
-      .delete(`https://trainee.software/admin/payments/${payment.paymentId}`)
-      .then(() => setShowDeleteModal(false));
+  const deletePayment = async () => {
+    const response = await axios.delete(
+      `https://trainee.software/admin/payments/${payment.paymentId}`
+    );
+    if (response.status === 200) {
+      toast.show({ description: "Payment deleted." });
+      onDelete(payment.paymentId);
+      setShowDeleteModal(false);
+    } else {
+      toast.show({ description: "Payment could not be deleted." });
+    }
   };
 
   return (
@@ -62,7 +75,9 @@ const Payment: React.FC<Props> = ({ payment }) => {
               size: "xs",
             }}
             colorScheme="gray"
-            onPress={() => navigation.navigate("Edit Payment", { payment })}
+            onPress={() =>
+              navigation.navigate("Edit Payment", { payment, onEdit })
+            }
           />
           <IconButton
             size="lg"

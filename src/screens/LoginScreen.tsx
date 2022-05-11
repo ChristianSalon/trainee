@@ -12,13 +12,13 @@ import {
   useToast,
   Icon,
 } from "native-base";
-import { StatusBar } from "expo-status-bar";
 import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../themes";
 import { auth } from "../firebase";
 import { Platform } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { StatusBar } from "../components";
 
 const LoginScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -149,7 +149,6 @@ const LoginScreen = ({ navigation }) => {
                 <Button
                   size="sm"
                   variant="link"
-                  w=""
                   _text={{ underline: true, color: "dark.500" }}
                   onPress={() => reset(values.email)}
                 >

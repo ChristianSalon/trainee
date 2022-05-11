@@ -14,6 +14,7 @@ import {
   Pressable,
   Icon,
   useColorModeValue,
+  useToast,
 } from "native-base";
 import * as Yup from "yup";
 import {
@@ -27,6 +28,7 @@ import { Feather } from "@expo/vector-icons";
 import { theme } from "../themes";
 import { SelectModalInputProps } from "../types";
 import { useClub } from "../hooks";
+import { useNavigation } from "@react-navigation/native";
 
 interface formValues {
   name: string;
@@ -35,7 +37,18 @@ interface formValues {
   amount: string;
 }
 
-const CreateNewPaymentScreen = ({ navigation }) => {
+interface Props {
+  route: {
+    params: {
+      onCreate: () => Promise<void>;
+    };
+  };
+}
+
+const CreateNewPaymentScreen = ({ route }: Props) => {
+  const navigation = useNavigation();
+  const toast = useToast();
+  const { onCreate } = route.params;
   const timestamp = new Date();
   timestamp.setSeconds(0, 0);
   const { club } = useClub();
@@ -62,18 +75,24 @@ const CreateNewPaymentScreen = ({ navigation }) => {
   }, []);
 
   const createPayment = async (values: formValues) => {
-    axios
-      .post(`https://trainee.software/admin/payments`, {
+    const response = await axios.post(
+      `https://trainee.software/admin/payments`,
+      {
         teamIds: values.teams.join(","),
         name: values.name,
         details: values.details,
         amount: Number(values.amount),
         createdAt: timestamp.toISOString().split("T")[0],
         dueDate: dueDate.toISOString().split("T")[0],
-      })
-      .then(() => {
-        navigation.goBack();
-      });
+      }
+    );
+    if (response.status === 200) {
+      toast.show({ description: "Payment created." });
+      await onCreate();
+      navigation.goBack();
+    } else {
+      toast.show({ description: "Failed to create payment." });
+    }
   };
 
   const schema = Yup.object().shape({
@@ -180,7 +199,7 @@ const CreateNewPaymentScreen = ({ navigation }) => {
                 variant="solid"
                 colorScheme="primary"
                 w="full"
-                onPress={handleSubmit}
+                onPress={() => handleSubmit()}
               >
                 Create Payment
               </Button>
