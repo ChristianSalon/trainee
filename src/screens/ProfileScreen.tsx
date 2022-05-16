@@ -29,6 +29,7 @@ import { storage, db, auth } from "../firebase";
 import { colorModeManager } from "../colorModeManager";
 import { useTheme } from "../hooks";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = ({ navigation }) => {
   const signedInUser = auth.currentUser;
@@ -42,11 +43,17 @@ const ProfileScreen = ({ navigation }) => {
   const { setPersistedTheme } = useTheme();
 
   const logout = () => {
-    auth.signOut().then(() => {
+    auth.signOut().then(async () => {
       navigation.reset({
         index: 0,
         routes: [{ name: "Auth" }],
       });
+      const token = await AsyncStorage.getItem(
+        `@notification-token-${signedInUser.uid}`
+      );
+      axios.delete(
+        `https://trainee.software/notifications/user/${signedInUser.uid}/token/${token}`
+      );
     });
   };
 

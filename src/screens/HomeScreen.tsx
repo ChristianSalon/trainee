@@ -25,6 +25,7 @@ import { Team } from "../components";
 import { RefreshControl, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -45,11 +46,17 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const signOut = () => {
-    auth.signOut().then(() => {
+    auth.signOut().then(async () => {
       navigation.reset({
         index: 0,
         routes: [{ name: "Auth" }],
       });
+      const token = await AsyncStorage.getItem(
+        `@notification-token-${auth.currentUser.uid}`
+      );
+      axios.delete(
+        `https://trainee.software/notifications/user/${auth.currentUser.uid}/token/${token}`
+      );
     });
   };
 
