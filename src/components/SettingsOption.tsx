@@ -16,7 +16,7 @@ const SettingsOption: React.FC<Props> = ({
   onPress,
 }) => {
   return (
-    <Pressable onPress={() => onPress()}>
+    <Pressable onPress={onPress}>
       <HStack space="6" alignItems="center">
         {icon}
         <VStack>

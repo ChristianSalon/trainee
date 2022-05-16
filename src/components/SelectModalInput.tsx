@@ -27,6 +27,10 @@ const SelectModalInput: React.FC<Props> = ({
     data.length === 0 ? setIsLoading(true) : setIsLoading(false);
   }, [data]);
 
+  const showSelectModal = () => {
+    setShowModal(true);
+  };
+
   return (
     <Pressable
       py="3"
@@ -39,7 +43,7 @@ const SelectModalInput: React.FC<Props> = ({
       borderColor={useColorModeValue("gray.300", "gray.700")}
       borderWidth="1"
       fontSize="sm"
-      onPress={() => setShowModal(true)}
+      onPress={showSelectModal}
     >
       <HStack flex="1" justifyContent="space-between" alignItems="center">
         <Text

@@ -20,11 +20,9 @@ const Team: React.FC<Props> = ({ team }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deleteTeam = () => {
-    console.log(team);
     axios
       .delete(`https://trainee.software/admin/teams/${team.teamId}`)
       .then((response) => {
-        console.log(response);
         db.collection("teams").doc(team.teamId).delete();
         setShowDeleteModal(false);
       });

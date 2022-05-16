@@ -15,12 +15,9 @@ export const ThemeProvider: React.FC<React.ReactNode> = ({ children }) => {
     const fetchPersistedTheme = async () => {
       try {
         const persistedTheme = await colorModeManager.get().then((val) => {
-          //console.log("dcdsv" + val);
           setPersistedTheme(val === "light" ? "light" : "dark");
         });
-      } catch (err) {
-        console.log(err.message);
-      }
+      } catch (err) {}
     };
     fetchPersistedTheme();
   });

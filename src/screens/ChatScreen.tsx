@@ -30,6 +30,7 @@ import {
 } from "../components";
 import firebase from "firebase";
 import { Team } from "../types";
+import axios from "axios";
 
 const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
@@ -94,6 +95,16 @@ const ChatScreen = () => {
         type: "TEXTMESSAGE",
       });
       setInput("");
+
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: team.teamId,
+        userId: auth.currentUser.uid,
+        title: team.name,
+        body: `New message from ${auth.currentUser.displayName}.`,
+        android: {
+          channelId: "chat",
+        },
+      });
     }
   };
 

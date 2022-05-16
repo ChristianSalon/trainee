@@ -66,26 +66,29 @@ const CreateNewEventScreen = ({ navigation }) => {
 
   const createEvent = async (values: FormValues) => {
     const docRef = db.collection("events").doc();
-    console.log(values);
     const startTime = startDate.toLocaleTimeString().slice(0, 5);
     const endTime = endDate.toLocaleTimeString().slice(0, 5);
-    console.log(startTime + " - " + endTime);
-    axios
-      .post(`https://trainee.software/events`, {
-        teams: values.teams,
-        eventId: docRef.id,
-        name: values.name,
-        details: values.details,
-        attendanceNumber: 0,
-        location: values.location,
-        startTime,
-        endTime,
-        startDate: startDate.toISOString().replace("Z", ""),
-        endDate: endDate.toISOString().replace("Z", ""),
-      })
-      .then(() => {
-        navigation.goBack();
+    const response = await axios.post(`https://trainee.software/events`, {
+      teams: values.teams,
+      eventId: docRef.id,
+      name: values.name,
+      details: values.details,
+      attendanceNumber: 0,
+      location: values.location,
+      startTime,
+      endTime,
+      startDate: startDate.toISOString().replace("Z", ""),
+      endDate: endDate.toISOString().replace("Z", ""),
+    });
+    if (response.status === 200) {
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: values.teams,
+        userId: auth.currentUser.uid,
+        title: team.name,
+        body: "New event created.",
       });
+    }
+    navigation.goBack();
   };
 
   const schema = Yup.object().shape({
@@ -188,7 +191,7 @@ const CreateNewEventScreen = ({ navigation }) => {
                 variant="solid"
                 colorScheme="primary"
                 w="full"
-                onPress={handleSubmit}
+                onPress={() => handleSubmit()}
               >
                 Create Event
               </Button>

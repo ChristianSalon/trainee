@@ -15,9 +15,13 @@ const DeleteModal: React.FC<Props> = ({
   onDelete,
   headerText,
 }) => {
+  const onClose = () => {
+    setShowModal(false);
+  };
+
   return (
     <Center>
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+      <Modal isOpen={showModal} onClose={onClose}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
           <Modal.Header>{headerText}</Modal.Header>

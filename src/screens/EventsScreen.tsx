@@ -25,6 +25,7 @@ const EventsScreen = () => {
   const navigation = useNavigation();
   const [events, setEvents] = useState<{ [key: string]: Event[] }>({});
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { team, roles } = useTeam();
 
   const getEvents = async (dateString: string) => {
@@ -32,13 +33,32 @@ const EventsScreen = () => {
       `https://trainee.software/events/${team.teamId}?date=${dateString}`
     );
     let events: { [key: string]: Event[] } = {};
+    let prevDate = dateString;
     results.data.forEach((item: Event) => {
       const strTime = item.startDate.split("T")[0];
+      const diffDays = Math.ceil(
+        (new Date(strTime).getTime() - new Date(prevDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
       if (!events[strTime]) {
         events[strTime] = [];
       }
+      console.log(diffDays);
+      // empty dates
+      /*for (let i = 0; i < diffDays; i++) {
+        console.log(prevDate);
+        if (!events[prevDate]) {
+          events[prevDate] = [];
+        }
+        // prevDate++;
+        const newDate = new Date(prevDate);
+        newDate.setDate(newDate.getDate() + 1);
+        prevDate = newDate.toISOString().split("T")[0];
+      }*/
       events[strTime].push(item);
+      //prevDate = strTime;
     });
+    console.log(events);
 
     setEvents(events);
     setIsLoaded(true);
@@ -50,6 +70,10 @@ const EventsScreen = () => {
 
   const renderItem = (item: Event) => {
     return <EventComponent event={item} />;
+  };
+
+  const navigate = () => {
+    navigation.navigate("Create New Event");
   };
 
   return (
@@ -100,6 +124,11 @@ const EventsScreen = () => {
                     </Box>
                   );
                 }}
+                onRefresh={() =>
+                  getEvents(new Date().toISOString().split("T")[0])
+                }
+                // Set this true while waiting for new data from a refresh
+                refreshing={isRefreshing}
               />
               {(roles.isCoach || roles.isManager) && (
                 <Fab
@@ -110,7 +139,7 @@ const EventsScreen = () => {
                       size="sm"
                     />
                   }
-                  onPress={() => navigation.navigate("Create New Event")}
+                  onPress={navigate}
                   placement="bottom-right"
                   renderInPortal={false}
                 />

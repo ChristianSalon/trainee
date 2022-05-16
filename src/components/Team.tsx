@@ -34,7 +34,7 @@ const Team: React.FC<TeamProps> = ({ team }) => {
   };
 
   return (
-    <Pressable onPress={() => navigateToClub()}>
+    <Pressable onPress={navigateToClub}>
       {/*<Divider />*/}
       <Box justifyContent="center" py="3" px="20px">
         <HStack alignItems="center" space={4}>

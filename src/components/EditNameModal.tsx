@@ -31,9 +31,13 @@ const EditNameModal = ({ showModal, setShowModal }) => {
       });
   };
 
+  const onClose = () => {
+    setShowModal(false);
+  };
+
   return (
     <Center>
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+      <Modal isOpen={showModal} onClose={onClose}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
           <Modal.Header>Edit Name</Modal.Header>

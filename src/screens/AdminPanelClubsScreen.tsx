@@ -30,20 +30,9 @@ const AdminPanelClubsScreen = ({ navigation }) => {
     getClubs();
   }, []);
 
-  /*const getUsers = () => {
-    axios
-      .get("https://trainee.software/clubs")
-      .then((response) => {
-        // handle success
-        console.log(response);
-        setClubs(response.data);
-        console.log(clubs);
-      })
-      .catch((error) => {
-        // handle error
-        console.log(error.message);
-      });
-  };*/
+  const navigate = () => {
+    navigation.navigate("Create New Club");
+  };
 
   return (
     <>
@@ -57,7 +46,7 @@ const AdminPanelClubsScreen = ({ navigation }) => {
       />
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
-        onPress={() => navigation.navigate("Create New Club")}
+        onPress={navigate}
         placement="bottom-right"
         renderInPortal={false}
       />

@@ -20,6 +20,7 @@ import { theme } from "../themes";
 import { useNavigation } from "@react-navigation/native";
 import { Payment, SelectModalInputProps } from "../types";
 import { useClub } from "../hooks";
+import { auth } from "../firebase";
 
 interface formValues {
   name: string;
@@ -78,6 +79,12 @@ const EditPaymentScreen = ({ route }) => {
       }
     );
     if (response.status === 200) {
+      axios.post(`https://trainee.software/notifications/clubs`, {
+        clubId: club.clubId,
+        userId: auth.currentUser.uid,
+        title: club.name,
+        body: `Payment ${payment.name} has been edited.`,
+      });
       toast.show({ description: "Payment updated." });
       await onEdit();
       navigation.goBack();

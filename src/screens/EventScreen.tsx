@@ -33,14 +33,35 @@ const EventScreen = ({ route }) => {
   const [excuseNote, setExcuseNote] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  let profilePhotos: ReactElement[] = [];
-  const [profilePhotosState, setProfilePhotosState] = useState<ReactElement[]>(
-    []
-  );
+  let profilePhotos: string[] = [];
+  const [profilePhotosState, setProfilePhotosState] = useState<string[]>([]);
   let margin = 0;
+  console.log("RENDER" + profilePhotos);
+
+  useEffect(() => {
+    console.log("ME");
+    if (isComing && margin / 4 <= 10) {
+      console.log("ME PUSH");
+      console.log(profilePhotos);
+      //setProfilePhotosState([...profilePhotosState, auth.currentUser.photoURL]);
+      setProfilePhotosState((prev) => [...prev, auth.currentUser.photoURL]);
+      //profilePhotosState.push(auth.currentUser.photoURL);
+      margin += 4;
+    }
+    if (!isComing) {
+      setProfilePhotosState(
+        profilePhotosState.filter((photoURL) => {
+          return photoURL !== auth.currentUser.photoURL;
+        })
+      );
+    }
+
+    console.log("ME END");
+  }, [isComing]);
 
   useEffect(() => {
     const getAttendance = async () => {
+      console.log("ALL");
       const results = await axios.get(
         `https://trainee.software/attendance/${event.eventId}`
       );
@@ -57,57 +78,22 @@ const EventScreen = ({ route }) => {
           setAnswered(true);
           setIsComing(a.isComing === MysqlBoolean.True ? true : false);
         }
-        if (a.isComing && margin / 4 <= 10) {
-          profilePhotos.push(
-            <Avatar
-              bg="transparent"
-              size="xs"
-              ml={margin}
-              source={{
-                uri: a.photoURL,
-              }}
-            />
-          );
+        if (
+          a.isComing === MysqlBoolean.True &&
+          margin / 4 <= 10 &&
+          a.userId !== auth.currentUser.uid
+        ) {
+          profilePhotos.push(a.photoURL);
           margin += 4;
         }
       });
+      console.log("ALL END");
+      console.log(profilePhotos);
       setProfilePhotosState(profilePhotos);
     };
     getAttendance();
     setIsLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (isComing && margin / 4 <= 10) {
-      profilePhotos.push(
-        <Avatar
-          bg="transparent"
-          size="xs"
-          ml={margin}
-          source={{
-            uri: auth.currentUser.photoURL,
-          }}
-        />
-      );
-      margin += 4;
-    }
-    if (!isComing) {
-      const index = profilePhotos.indexOf(
-        <Avatar
-          bg="transparent"
-          size="xs"
-          ml={margin}
-          source={{
-            uri: auth.currentUser.photoURL,
-          }}
-        />
-      );
-      if (index > -1) {
-        profilePhotos.splice(index, 1);
-      }
-    }
-    setProfilePhotosState(profilePhotos);
-  }, [isComing]);
 
   const saveAttendance = async (isComingParameter: boolean) => {
     if (isComingParameter === isComing && answered === true) {
@@ -137,7 +123,6 @@ const EventScreen = ({ route }) => {
         date: dateString,
         excuseNote: undefined,
       });
-      console.log(resopnse);
       setIsComing(isComingParameter);
       setAnswered(true);
     } else {
@@ -184,6 +169,12 @@ const EventScreen = ({ route }) => {
         event.startTime
       } - ${event.endTime}`;
     }
+  };
+
+  const navigate = () => {
+    navigation.navigate("Attendance", {
+      eventId: event.eventId,
+    });
   };
 
   return (
@@ -323,9 +314,18 @@ const EventScreen = ({ route }) => {
                     onSave={saveIsNotComingAttendance}
                   />
                 )}
-                <Box flexDirection="row" justifyContent="space-between" mt="4">
+                <Box flexDirection="row" justifyContent="space-between" mt="5">
                   <ZStack reversed>
-                    {profilePhotosState}
+                    {profilePhotosState.map((profilePhoto, index) => (
+                      <Avatar
+                        bg="transparent"
+                        size="xs"
+                        ml={`${index * 16}px`}
+                        source={{
+                          uri: profilePhoto,
+                        }}
+                      />
+                    ))}
                     <Avatar bg="gray.300" size="xs">
                       0
                     </Avatar>
@@ -334,11 +334,7 @@ const EventScreen = ({ route }) => {
                     size="sm"
                     variant="link"
                     colorScheme="secondary"
-                    onPress={() =>
-                      navigation.navigate("Attendance", {
-                        eventId: event.eventId,
-                      })
-                    }
+                    onPress={navigate}
                   >
                     See All
                   </Button>

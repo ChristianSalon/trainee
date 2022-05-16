@@ -19,7 +19,6 @@ const AttendanceScreen = ({ route }) => {
     );
     setAttendance(results.data);
     setRefreshing(false);
-    console.log(attendance);
   };
 
   useEffect(() => {

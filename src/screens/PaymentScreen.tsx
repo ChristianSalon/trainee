@@ -17,7 +17,6 @@ const PaymentScreen = () => {
       `https://trainee.software/payments/team/${team.teamId}/user/${auth.currentUser.uid}`
     );
     setPayments(results.data);
-    console.log("hfjisvisfvi");
   };
 
   useEffect(() => {

@@ -29,6 +29,7 @@ import { theme } from "../themes";
 import { SelectModalInputProps } from "../types";
 import { useClub } from "../hooks";
 import { useNavigation } from "@react-navigation/native";
+import { auth } from "../firebase";
 
 interface formValues {
   name: string;
@@ -87,6 +88,12 @@ const CreateNewPaymentScreen = ({ route }: Props) => {
       }
     );
     if (response.status === 200) {
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: values.teams,
+        userId: auth.currentUser.uid,
+        title: club.name,
+        body: "New payment created.",
+      });
       toast.show({ description: "Payment created." });
       await onCreate();
       navigation.goBack();

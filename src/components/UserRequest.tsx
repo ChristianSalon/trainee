@@ -9,6 +9,7 @@ import {
   Button,
 } from "native-base";
 import axios from "axios";
+import { useClub } from "../hooks";
 
 interface Props {
   user: {
@@ -22,18 +23,25 @@ interface Props {
 
 const UserRequest: React.FC<Props> = ({ user, teamId }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { club } = useClub();
   const onClose = () => setIsDialogOpen(false);
   const cancelRef = useRef(null);
 
-  const sendRequest = () => {
+  const sendRequest = async () => {
     const date = new Date().toISOString().slice(0, -8);
-    axios
-      .post(`https://trainee.software/requests`, {
-        teamId: teamId,
+    const response = await axios.post(`https://trainee.software/requests`, {
+      teamId: teamId,
+      userId: user.userId,
+      date,
+    });
+    if (response.status === 200) {
+      axios.post(`https://trainee.software/notifications/user`, {
         userId: user.userId,
-        date,
-      })
-      .then(() => onClose());
+        title: club.name,
+        body: "You have a new join request.",
+      });
+    }
+    onClose();
   };
 
   return (

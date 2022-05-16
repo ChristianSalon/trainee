@@ -28,6 +28,7 @@ import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 import { colorModeManager } from "../colorModeManager";
 import { useTheme } from "../hooks";
+import axios from "axios";
 
 const ProfileScreen = ({ navigation }) => {
   const signedInUser = auth.currentUser;
@@ -62,7 +63,6 @@ const ProfileScreen = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log(result);
     if (result.cancelled) {
       return;
     }
@@ -74,7 +74,6 @@ const ProfileScreen = ({ navigation }) => {
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
-        console.log(e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -86,12 +85,26 @@ const ProfileScreen = ({ navigation }) => {
     await ref.put(blob);
     blob.close();
 
-    ref.getDownloadURL().then((url) => {
+    ref.getDownloadURL().then(async (url) => {
+      const response = await axios.put(
+        `https://trainee.software/users/editPhoto/${auth.currentUser.uid}`,
+        {
+          photoURL: url,
+        }
+      );
       auth.currentUser.updateProfile({
         photoURL: url,
       });
       setSelectedPhotoURI(url);
     });
+  };
+
+  const showEditNameModal = () => {
+    setShowModal(true);
+  };
+
+  const navigate = () => {
+    navigation.navigate("Requests");
   };
 
   return (
@@ -131,7 +144,7 @@ const ProfileScreen = ({ navigation }) => {
           }
           placeholder="Your name"
           value={signedInUser.displayName}
-          onPress={() => setShowModal(true)}
+          onPress={showEditNameModal}
         />
         <SettingsOption
           icon={
@@ -143,7 +156,7 @@ const ProfileScreen = ({ navigation }) => {
           }
           placeholder="Show join requests"
           value="Requests"
-          onPress={() => navigation.navigate("Requests")}
+          onPress={navigate}
         />
         <Divider />
         <HStack space="6" alignItems="center">
@@ -182,35 +195,6 @@ const ProfileScreen = ({ navigation }) => {
       {showModal && (
         <EditNameModal showModal={showModal} setShowModal={setShowModal} />
       )}
-      {/*showThemeModal && (
-        <SelectModal
-          showModal={showThemeModal}
-          setShowModal={setShowThemeModal}
-          isLoading={false}
-          headerText={"Select Theme"}
-          value={[theme]}
-          onValueChange={(value) => {
-            const theme = value[value.length - 1];
-            console.log("SET" + theme);
-            setTheme(theme);
-            setColorMode(theme);
-            colorModeManager.set(theme === "dark" ? "dark" : "light");
-            setPersistedTheme(theme);
-          }}
-          data={[
-            {
-              key: "light",
-              value: "light",
-              text: "Light",
-            },
-            {
-              key: "dark",
-              value: "dark",
-              text: "Dark",
-            },
-          ]}
-        />
-        )*/}
     </Box>
   );
 };

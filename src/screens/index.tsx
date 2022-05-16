@@ -4,7 +4,6 @@ import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import EventsScreen from "../screens/EventsScreen";
 import ChatScreen from "../screens/ChatScreen";
-import TeamScreen from "../screens/TeamScreen";
 import EventScreen from "../screens/EventScreen";
 import PaymentScreen from "../screens/PaymentScreen";
 import ImageDetailScreen from "../screens/ImageDetailScreen";
@@ -17,7 +16,6 @@ import CreateNewPaymentScreen from "../screens/CreateNewPaymentScreen";
 import EditClubScreen from "../screens/EditClubScreen";
 import EditTeamScreen from "../screens/EditTeamScreen";
 import EditPaymentScreen from "../screens/EditPaymentScreen";
-import AddNewTeamScreen from "../screens/AddNewTeamScreen";
 import AdminPanelClubsScreen from "../screens/AdminPanelClubsScreen";
 import AdminPanelTeamsScreen from "../screens/AdminPanelTeamsScreen";
 import AdminPanelPaymentsScreen from "../screens/AdminPanelPaymentsScreen";
@@ -33,7 +31,6 @@ export {
   ProfileScreen,
   EventsScreen,
   ChatScreen,
-  TeamScreen,
   EventScreen,
   PaymentScreen,
   ImageDetailScreen,
@@ -46,7 +43,6 @@ export {
   EditClubScreen,
   EditTeamScreen,
   EditPaymentScreen,
-  AddNewTeamScreen,
   AdminPanelClubsScreen,
   AdminPanelTeamsScreen,
   AdminPanelPaymentsScreen,

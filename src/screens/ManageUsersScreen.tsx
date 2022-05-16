@@ -52,6 +52,10 @@ const ManageUsersScreen = ({ route }) => {
     getUsers();
   }, []);
 
+  const navigate = () => {
+    navigation.navigate("Add New Users", { team });
+  };
+
   return (
     <>
       <FlatList
@@ -66,7 +70,7 @@ const ManageUsersScreen = ({ route }) => {
       />
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
-        onPress={() => navigation.navigate("Add New Users", { team })}
+        onPress={navigate}
         placement="bottom-right"
         renderInPortal={false}
       />

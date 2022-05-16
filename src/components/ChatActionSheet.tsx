@@ -8,6 +8,7 @@ import { storage, db, auth } from "../firebase";
 import firebase from "firebase";
 import useTeam from "../hooks/useTeam";
 import { Audio } from "expo-av";
+import axios from "axios";
 
 const ChatActionSheet: React.FC<ActionSheetProps> = ({
   isOpen,
@@ -32,7 +33,6 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
       quality: 1,
     });
 
-    console.log(result);
     if (result.cancelled) {
       return;
     }
@@ -44,7 +44,6 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
-        console.log(e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -74,6 +73,15 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         width: result.width,
         height: result.height,
       });
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: team.teamId,
+        userId: auth.currentUser.uid,
+        title: team.name,
+        body: `New message from ${auth.currentUser.displayName}.`,
+        android: {
+          channelId: "chat",
+        },
+      });
       setUploading(false);
       onClose();
     });
@@ -92,7 +100,6 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
       quality: 1,
     });
 
-    console.log(result);
     if (result.cancelled) {
       return;
     }
@@ -104,7 +111,6 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
-        console.log(e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -132,6 +138,15 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         type: "VIDEOMESSAGE",
       });
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: team.teamId,
+        userId: auth.currentUser.uid,
+        title: team.name,
+        body: `New message from ${auth.currentUser.displayName}.`,
+        android: {
+          channelId: "chat",
+        },
+      });
       setUploading(false);
       onClose();
     });
@@ -139,29 +154,22 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
 
   const recordAudio = async () => {
     try {
-      console.log("Requesting permissions..");
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      console.log("Starting recording..");
       const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
       );
       setRecording(recording);
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
+    } catch (err) {}
   };
 
   const stopRecording = async () => {
-    console.log("Stopping recording..");
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
-    console.log("Recording stopped and stored at", uri);
 
     setUploading(true);
 
@@ -171,7 +179,6 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
-        console.log(e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -198,6 +205,15 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         photoURL: signedInUser.photoURL,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         type: "AUDIOMESSAGE",
+      });
+      axios.post(`https://trainee.software/notifications/teams`, {
+        teamIds: team.teamId,
+        userId: auth.currentUser.uid,
+        title: team.name,
+        body: `New message from ${auth.currentUser.displayName}.`,
+        android: {
+          channelId: "chat",
+        },
       });
       setUploading(false);
       onClose();

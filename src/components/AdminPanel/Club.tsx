@@ -21,7 +21,6 @@ const Club: React.FC<Props> = ({ club }) => {
     axios
       .delete(`https://trainee.software/admin/clubs/${club.clubId}`)
       .then((response) => {
-        console.log(response);
         db.collection("clubs").doc(club.clubId).delete();
         /*db.collection("teams")
           .get()
@@ -52,6 +51,10 @@ const Club: React.FC<Props> = ({ club }) => {
         },
       },
     });
+  };
+
+  const showModal = () => {
+    setShowDeleteModal(true);
   };
 
   return (
@@ -92,7 +95,7 @@ const Club: React.FC<Props> = ({ club }) => {
               size: "xs",
             }}
             colorScheme="red"
-            onPress={() => setShowDeleteModal(true)}
+            onPress={showModal}
           />
         </HStack>
       </HStack>

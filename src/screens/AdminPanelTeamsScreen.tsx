@@ -42,6 +42,10 @@ const AdminPanelTeamsScreen = ({ route }) => {
     getTeams();
   }, []);
 
+  const navigate = () => {
+    navigation.navigate("Create New Team");
+  };
+
   return (
     <>
       <FlatList
@@ -54,7 +58,7 @@ const AdminPanelTeamsScreen = ({ route }) => {
       />
       <Fab
         icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
-        onPress={() => navigation.navigate("Create New Team")}
+        onPress={navigate}
         placement="bottom-right"
         renderInPortal={false}
       />

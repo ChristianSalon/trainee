@@ -35,8 +35,6 @@ const EditClubScreen = ({ route }) => {
   const [selectedPhotoURI, setSelectedPhotoURI] = useState("");
   const signedInUser = auth.currentUser;
 
-  console.log(club);
-
   const save = async (values: FormValues) => {
     const docRef = db.collection("clubs").doc(club.clubId);
 
@@ -47,7 +45,6 @@ const EditClubScreen = ({ route }) => {
           resolve(xhr.response);
         };
         xhr.onerror = function (e) {
-          console.log(e);
           reject(new TypeError("Network request failed"));
         };
         xhr.responseType = "blob";

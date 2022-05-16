@@ -66,6 +66,10 @@ const RegisterScreen = ({ navigation }) => {
 
   type FormValues = Yup.InferType<typeof schema>;
 
+  const goBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <>
       <StatusBar style={"light"} />
@@ -154,7 +158,7 @@ const RegisterScreen = ({ navigation }) => {
                   size="sm"
                   variant="link"
                   _text={{ underline: true, color: "dark.500" }}
-                  onPress={() => navigation.goBack()}
+                  onPress={goBack}
                 >
                   I already have an account
                 </Button>

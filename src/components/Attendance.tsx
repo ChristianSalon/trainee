@@ -21,7 +21,6 @@ const Attendance: React.FC<Props> = ({ attendance }) => {
   const date = new Date(attendance.date);
   const timestamp = date.toLocaleString();
   const { roles } = useTeam();
-  console.log(attendance);
 
   return (
     <Box w="100%" px="20px" py="10px">

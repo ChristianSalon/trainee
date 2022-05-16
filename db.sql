@@ -197,6 +197,14 @@ INSERT INTO payments_users (`userId`, `paymentId`, `settledAt`) VALUES
 	("HZVm04WIs4aVriRAQBbeKDhnYGI2", 4, NULL),
 	("HZVm04WIs4aVriRAQBbeKDhnYGI2", 5, "2022-04-10"),
 	("HZVm04WIs4aVriRAQBbeKDhnYGI2", 6, NULL);
+    
+create table notification_tokens (
+  `id` int not null auto_increment,
+  `userId` varchar(50) not null,
+  `token` text not null,
+  primary key (`id`),
+  foreign key (`userId`) references users(`userId`)
+);
    
 drop table events_teams;
 drop table attendance;
@@ -213,20 +221,40 @@ drop table payments;
     
 select * from clubs;
 select * from users;
-select * from clubs_users;
+select * from teams;
 select * from teams_users;
+select * from clubs_users;
 select * from events;
 select * from attendance;
 select * from events_teams;
-select * from teams;
 select * from requests;
 select * from payments;
 select * from payments_users;
 select * from payments_teams;
+select * from notification_tokens;
 
 /*UPDATE clubs SET  accountId = 'acct_1KqepjBDdBqJhPkT' WHERE clubId = "urI3ZiiUl3yCoFnEBtZJ";*/
 
 SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
+/*INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('2xa7pVtzUNUfgOizc6supYef5CW2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 15:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('Pfwqan634HSoODTZG3XPqrBB9ig2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 16:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('AgjZuUgw2Ac3aNkNB5TbrwQxfgc2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 17:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('XwsSN5oDl5Wtgm8juh6DkzjiLFo2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 18:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('amxC49g9mbbBD87hvZ1rfHjADSg2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 19:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`) VALUES ('w1CuyisrsZNzUOBzAXWO5U1rb6f2', 'K01vQKlCqNdN7MRpNAWC', '1', '2022-05-14 10:28:14');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`, `excuseNote`) VALUES ('FXvbnl8Ph4XUMavKUcBiqDJ83P53', 'K01vQKlCqNdN7MRpNAWC', '0', '2022-05-14 11:28:14', 'Choroba');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`, `excuseNote`) VALUES ('vB1ctMWoNYayUNl8iFig00vJosr2', 'K01vQKlCqNdN7MRpNAWC', '0', '2022-05-14 12:28:14', 'Choroba');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`, `excuseNote`) VALUES ('a2tjiNLXjTbBarlCpozRmvD9bUD3', 'K01vQKlCqNdN7MRpNAWC', '0', '2022-05-14 13:28:14', 'Škola');
+INSERT INTO `trainee`.`attendance` (`userId`, `eventId`, `isComing`, `date`, `excuseNote`) VALUES ('qZgjRBE5dZMKY7ds8df7EYJh7l92', 'K01vQKlCqNdN7MRpNAWC', '0', '2022-05-14 14:28:14', 'Škola');
+*/
+
+SELECT nt.token FROM notification_tokens AS nt
+    INNER JOIN teams_users AS tu ON nt.userId = tu.userId
+    INNER JOIN teams AS t ON tu.teamId = t.teamId
+    INNER JOIN clubs AS c ON c.clubId = t.clubId
+    WHERE c.clubId = "urI3ZiiUl3yCoFnEBtZJ" AND nt.userId != "HZVm04WIs4aVriRAQBbeKDhnYGI2"
+    GROUP BY tu.userId;
 
 SELECT p.*, GROUP_CONCAT(t.teamId SEPARATOR ', ') AS "teamsIds" FROM payments_teams AS pt 
     INNER JOIN payments AS p ON pt.paymentId = p.paymentId
@@ -249,7 +277,8 @@ SELECT et.teamId FROM events_teams AS et INNER JOIN events AS e ON et.eventId = 
 SELECT c.clubId, c.name, c.photoURL FROM clubs_users AS cu 
     INNER JOIN clubs AS c ON cu.clubId = c.clubId 
     INNER JOIN users AS u ON cu.userId = u.userId 
-    WHERE u.userId = "HZVm04WIs4aVriRAQBbeKDhnYGI2" AND cu.role = "MANAGER";
+    WHERE u.userId = "HZVm04WIs4aVriRAQBbeKDhnYGI2" AND cu.role = "MANAGER"
+    ORDER BY c.name ASC;
 
 SELECT teamId, name FROM teams WHERE clubId = "urI3ZiiUl3yCoFnEBtZJ";
 

@@ -33,9 +33,18 @@ const TextInputModal: React.FC<Props> = ({
   placeholder,
   onSave,
 }) => {
+  const onClose = () => {
+    setShowModal(false);
+  };
+
+  const saveAndClose = () => {
+    onSave();
+    setShowModal(false);
+  };
+
   return (
     <Center>
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+      <Modal isOpen={showModal} onClose={onClose}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
           <Modal.Header>{headerText}</Modal.Header>
@@ -48,23 +57,10 @@ const TextInputModal: React.FC<Props> = ({
           </Modal.Body>
           <Modal.Footer>
             <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="gray"
-                onPress={() => {
-                  setShowModal(false);
-                }}
-              >
+              <Button variant="ghost" colorScheme="gray" onPress={onClose}>
                 Cancel
               </Button>
-              <Button
-                onPress={() => {
-                  onSave();
-                  setShowModal(false);
-                }}
-              >
-                Save
-              </Button>
+              <Button onPress={saveAndClose}>Save</Button>
             </Button.Group>
           </Modal.Footer>
         </Modal.Content>

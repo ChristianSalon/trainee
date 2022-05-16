@@ -17,6 +17,8 @@ import { Payment as PaymentProps } from "../../types";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { DeleteModal } from "..";
+import { useClub } from "../../hooks";
+import { auth } from "../../firebase";
 
 interface Props {
   payment: PaymentProps;
@@ -26,6 +28,7 @@ interface Props {
 
 const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
   const navigation = useNavigation();
+  const { club } = useClub();
   const toast = useToast();
   const dueDate = new Date(payment.dueDate);
   const bgColor =
@@ -39,12 +42,26 @@ const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
       `https://trainee.software/admin/payments/${payment.paymentId}`
     );
     if (response.status === 200) {
+      axios.post(`https://trainee.software/notifications/clubs`, {
+        clubId: club.clubId,
+        userId: auth.currentUser.uid,
+        title: club.name,
+        body: `Payment ${payment.name} has been deleted.`,
+      });
       toast.show({ description: "Payment deleted." });
       onDelete(payment.paymentId);
       setShowDeleteModal(false);
     } else {
       toast.show({ description: "Payment could not be deleted." });
     }
+  };
+
+  const showModal = () => {
+    setShowDeleteModal(true);
+  };
+
+  const navigate = () => {
+    navigation.navigate("Edit Payment", { payment, onEdit });
   };
 
   return (
@@ -75,9 +92,7 @@ const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
               size: "xs",
             }}
             colorScheme="gray"
-            onPress={() =>
-              navigation.navigate("Edit Payment", { payment, onEdit })
-            }
+            onPress={navigate}
           />
           <IconButton
             size="lg"
@@ -89,7 +104,7 @@ const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
               size: "xs",
             }}
             colorScheme="red"
-            onPress={() => setShowDeleteModal(true)}
+            onPress={showModal}
           />
         </VStack>
       </HStack>

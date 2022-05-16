@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   NavigationContainer,
   DefaultTheme,
@@ -19,7 +19,6 @@ import {
   ProfileScreen,
   EventsScreen,
   ChatScreen,
-  TeamScreen,
   EventScreen,
   PaymentScreen,
   ImageDetailScreen,
@@ -27,7 +26,6 @@ import {
   VideoDetailScreen,
   CreateNewClubScreen,
   CreateNewTeamScreen,
-  AddNewTeamScreen,
   AdminPanelClubsScreen,
   AdminPanelTeamsScreen,
   EditClubScreen,
@@ -51,6 +49,7 @@ import {
   useColorScheme,
   View,
   Appearance,
+  Platform,
 } from "react-native";
 import { auth } from "../firebase";
 import { StripeProvider } from "@stripe/stripe-react-native";
@@ -63,6 +62,8 @@ import {
 import axios from "axios";
 import { ThemeProvider } from "../hooks/useTheme";
 import { useTheme } from "../hooks";
+import * as Notifications from "expo-notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const greenTopbar = {
   headerStyle: { backgroundColor: "#139874" },
@@ -176,6 +177,73 @@ const MainStack = createNativeStackNavigator();
 };*/
 
 function MainStackScreen() {
+  const notificationListener = useRef<any>();
+  const responseListener = useRef<any>();
+
+  const registerForPushNotificationsAsync = async () => {
+    let token;
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+      });
+      Notifications.setNotificationChannelAsync("chat", {
+        name: "Chat messages",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+      });
+    }
+
+    return token;
+  };
+
+  useEffect(() => {
+    const userId = auth.currentUser.uid;
+    AsyncStorage.getItem(`@notification-token-${userId}`).then((value) => {
+      if (!value) {
+        registerForPushNotificationsAsync().then(async (token) => {
+          if (token) {
+            const response = await axios.post(
+              `https://trainee.software/notifications`,
+              {
+                userId,
+                token,
+              }
+            );
+            AsyncStorage.setItem(`@notification-token-${userId}`, token);
+          }
+        });
+      }
+    });
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {});
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {});
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
   return (
     <TeamProvider>
       <MainStack.Navigator screenOptions={{ headerShown: false }}>
@@ -244,6 +312,7 @@ function AdminDrawerScreen() {
           theme.colors.gray[800]
         ),
       }}
+      useLegacyImplementation={true}
       drawerContent={(props) => {
         return (
           <SafeAreaView
@@ -481,6 +550,14 @@ function RootStackScreen() {
     </RootStack.Navigator>
   );
 }
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Navigation() {
   const linking = {

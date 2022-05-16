@@ -5,7 +5,6 @@ import { Platform } from "react-native";
 import { storage, db, auth } from "../firebase";
 
 const PhotoChooser = ({ state, setState }) => {
-  console.log(state);
   const choosePhoto = async () => {
     if (Platform.OS !== "web") {
       const { status } =
