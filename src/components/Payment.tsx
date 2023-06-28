@@ -17,6 +17,7 @@ import {
 import React, { useState } from "react";
 import { Payment as PaymentProps } from "../types";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   payment: PaymentProps;
@@ -53,9 +54,9 @@ const Payment: React.FC<Props> = ({ payment, onRefresh }) => {
 
   const fetchPaymentSheetParams = async () => {
     const user = await axios.get(
-      `https://trainee.software/payments/customers/${auth.currentUser.uid}`
+      `${API_BASE_URL}/payments/customers/${auth.currentUser.uid}`
     );
-    const response = await axios.post(`https://trainee.software/payments`, {
+    const response = await axios.post(`${API_BASE_URL}/payments`, {
       customerId: user.data[0].customerId,
       accountId: payment.accountId,
       amount: payment.amount,

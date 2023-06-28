@@ -22,6 +22,7 @@ import { Platform } from "react-native";
 import axios from "axios";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { API_BASE_URL } from "@env";
 
 const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,13 +39,13 @@ const RegisterScreen = ({ navigation }) => {
           photoURL: defaultPhotoURL,
         });
         authUser.user.sendEmailVerification();
-        axios.post(`https://trainee.software/users`, {
+        axios.post(`${API_BASE_URL}/users`, {
           userId: authUser.user.uid,
           name: values.name,
           photoURL: defaultPhotoURL,
           email: values.email,
         });
-        axios.post(`https://trainee.software/payments/customers`, {
+        axios.post(`${API_BASE_URL}/payments/customers`, {
           userId: authUser.user.uid,
           name: values.name,
           email: values.email,

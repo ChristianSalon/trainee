@@ -14,6 +14,7 @@ import { Club } from "../components/AdminPanel";
 import { auth } from "../firebase";
 import { AntDesign } from "@expo/vector-icons";
 import { RefreshControl } from "react-native";
+import { API_BASE_URL } from "@env";
 
 const AdminPanelClubsScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -21,7 +22,7 @@ const AdminPanelClubsScreen = ({ navigation }) => {
 
   const getClubs = async () => {
     const response = await axios.get(
-      `https://trainee.software/admin/clubs/${auth.currentUser.uid}`
+      `${API_BASE_URL}/admin/clubs/${auth.currentUser.uid}`
     );
     setClubs(response.data);
   };

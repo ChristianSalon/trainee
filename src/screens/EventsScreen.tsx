@@ -20,6 +20,7 @@ import { Event as EventComponent, StatusBar } from "../components";
 import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { API_BASE_URL } from "@env";
 
 const EventsScreen = () => {
   const navigation = useNavigation();
@@ -30,7 +31,7 @@ const EventsScreen = () => {
 
   const getEvents = async (dateString: string) => {
     const results = await axios.get(
-      `https://trainee.software/events/${team.teamId}?date=${dateString}`
+      `${API_BASE_URL}/events/${team.teamId}?date=${dateString}`
     );
     let events: { [key: string]: Event[] } = {};
     let prevDate = dateString;

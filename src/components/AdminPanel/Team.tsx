@@ -5,6 +5,7 @@ import axios from "axios";
 import { db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { DeleteModal } from "..";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   team: {
@@ -21,7 +22,7 @@ const Team: React.FC<Props> = ({ team }) => {
 
   const deleteTeam = () => {
     axios
-      .delete(`https://trainee.software/admin/teams/${team.teamId}`)
+      .delete(`${API_BASE_URL}/admin/teams/${team.teamId}`)
       .then((response) => {
         db.collection("teams").doc(team.teamId).delete();
         setShowDeleteModal(false);

@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useClub } from "../../hooks";
 import { Club as ClubProps } from "../../types";
 import { DeleteModal } from "..";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   club: ClubProps;
@@ -19,7 +20,7 @@ const Club: React.FC<Props> = ({ club }) => {
 
   const deleteClub = () => {
     axios
-      .delete(`https://trainee.software/admin/clubs/${club.clubId}`)
+      .delete(`${API_BASE_URL}/admin/clubs/${club.clubId}`)
       .then((response) => {
         db.collection("clubs").doc(club.clubId).delete();
         /*db.collection("teams")

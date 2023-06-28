@@ -6,6 +6,7 @@ import { Payment, StatusBar } from "../components";
 import { RefreshControl } from "react-native";
 import { useTeam } from "../hooks";
 import { useStripe } from "@stripe/stripe-react-native";
+import { API_BASE_URL } from "@env";
 
 const PaymentScreen = () => {
   const [payments, setPayments] = useState([]);
@@ -14,7 +15,7 @@ const PaymentScreen = () => {
 
   const getPayments = async () => {
     const results = await axios.get(
-      `https://trainee.software/payments/team/${team.teamId}/user/${auth.currentUser.uid}`
+      `${API_BASE_URL}/payments/team/${team.teamId}/user/${auth.currentUser.uid}`
     );
     setPayments(results.data);
   };

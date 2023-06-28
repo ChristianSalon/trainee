@@ -10,6 +10,7 @@ import {
 } from "native-base";
 import axios from "axios";
 import { useClub } from "../hooks";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   user: {
@@ -29,13 +30,13 @@ const UserRequest: React.FC<Props> = ({ user, teamId }) => {
 
   const sendRequest = async () => {
     const date = new Date().toISOString().slice(0, -8);
-    const response = await axios.post(`https://trainee.software/requests`, {
+    const response = await axios.post(`${API_BASE_URL}/requests`, {
       teamId: teamId,
       userId: user.userId,
       date,
     });
     if (response.status === 200) {
-      axios.post(`https://trainee.software/notifications/user`, {
+      axios.post(`${API_BASE_URL}/notifications/user`, {
         userId: user.userId,
         title: club.name,
         body: "You have a new join request.",

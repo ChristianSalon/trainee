@@ -13,6 +13,7 @@ import {
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 const SelectTeamsModal = ({
   showModal,
@@ -26,7 +27,7 @@ const SelectTeamsModal = ({
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `https://trainee.software/admin/payments/teams/${auth.currentUser.uid}`
+        `${API_BASE_URL}/admin/payments/teams/${auth.currentUser.uid}`
       );
       setTeams(results.data);
       setIsLoading(false);

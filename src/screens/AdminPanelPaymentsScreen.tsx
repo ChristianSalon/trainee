@@ -16,6 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Payment, Team } from "../components/AdminPanel";
 import { useClub } from "../hooks";
 import { MysqlBoolean, Payment as PaymentProps } from "../types";
+import { API_BASE_URL } from "@env";
 
 const AdminPanelPaymentsScreen = ({ navigation }) => {
   const { club } = useClub();
@@ -25,7 +26,7 @@ const AdminPanelPaymentsScreen = ({ navigation }) => {
 
   const getPayments = async () => {
     const response = await axios.get(
-      `https://trainee.software/admin/payments/club/${club.clubId}`
+      `${API_BASE_URL}/admin/payments/club/${club.clubId}`
     );
     setPayments(response.data);
   };

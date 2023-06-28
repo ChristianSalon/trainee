@@ -7,6 +7,7 @@ import { PaymentStatus } from "../components/AdminPanel";
 import axios from "axios";
 import { RefreshControl } from "react-native";
 import { useTeam } from "../hooks";
+import { API_BASE_URL } from "@env";
 
 const PaymentStatusScreen = ({ route }) => {
   const [paymentStatus, setPaymentStatus] = useState([]);
@@ -16,7 +17,7 @@ const PaymentStatusScreen = ({ route }) => {
   const getPaymentStatus = async () => {
     setRefreshing(true);
     const results = await axios.get(
-      `https://trainee.software/admin/payments/${payment.paymentId}`
+      `${API_BASE_URL}/admin/payments/${payment.paymentId}`
     );
     setPaymentStatus(results.data);
     setRefreshing(false);
@@ -25,7 +26,7 @@ const PaymentStatusScreen = ({ route }) => {
   useEffect(() => {
     const getPaymentStatus = async () => {
       const results = await axios.get(
-        `https://trainee.software/admin/payments/${payment.paymentId}`
+        `${API_BASE_URL}/admin/payments/${payment.paymentId}`
       );
       setPaymentStatus(results.data);
     };

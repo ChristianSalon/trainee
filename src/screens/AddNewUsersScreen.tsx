@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { UserRequest } from "../components";
 import { theme } from "../themes";
 import { Feather } from "@expo/vector-icons";
+import { API_BASE_URL } from "@env";
 
 const AddNewUsersScreen = ({ route }) => {
   const { team } = route.params;
@@ -24,7 +25,7 @@ const AddNewUsersScreen = ({ route }) => {
   const getUsers = async (text: string) => {
     setSearch(text);
     const results = await axios.get(
-      `https://trainee.software/users/team/${team.teamId}/${text}`
+      `${API_BASE_URL}/users/team/${team.teamId}/${text}`
     );
     setUsers(results.data);
   };

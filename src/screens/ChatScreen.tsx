@@ -31,6 +31,7 @@ import {
 import firebase from "firebase";
 import { Team } from "../types";
 import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
@@ -96,7 +97,7 @@ const ChatScreen = () => {
       });
       setInput("");
 
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: team.teamId,
         userId: auth.currentUser.uid,
         title: team.name,

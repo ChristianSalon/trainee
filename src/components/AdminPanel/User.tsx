@@ -14,6 +14,7 @@ import { db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { useTeam } from "../../hooks";
 import SelectModal from "../SelectModal";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   user: {
@@ -36,7 +37,7 @@ const User: React.FC<Props> = ({ user, onDelete, onEdit }) => {
 
   const removeUser = async () => {
     const response = await axios.delete(
-      `https://trainee.software/admin/users/${user.teamId}/${user.userId}`
+      `${API_BASE_URL}/admin/users/${user.teamId}/${user.userId}`
     );
     if (response.status === 200) {
       toast.show({ description: "User removed from team." });
@@ -51,7 +52,7 @@ const User: React.FC<Props> = ({ user, onDelete, onEdit }) => {
       return;
     }
     const response = await axios.put(
-      `https://trainee.software/admin/users/editRole/${user.userId}`,
+      `${API_BASE_URL}/admin/users/editRole/${user.userId}`,
       {
         role,
       }

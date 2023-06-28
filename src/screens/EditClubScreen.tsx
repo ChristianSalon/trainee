@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Club, MysqlBoolean } from "../types";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { API_BASE_URL } from "@env";
 
 interface FormValues {
   clubName: string;
@@ -58,7 +59,7 @@ const EditClubScreen = ({ route }) => {
 
       ref.getDownloadURL().then((url) => {
         axios
-          .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
+          .put(`${API_BASE_URL}/admin/clubs/${club.clubId}`, {
             name: values.clubName,
             photoURL: url,
           })
@@ -75,7 +76,7 @@ const EditClubScreen = ({ route }) => {
       });
     } else {
       axios
-        .put(`https://trainee.software/admin/clubs/${club.clubId}`, {
+        .put(`${API_BASE_URL}/admin/clubs/${club.clubId}`, {
           name: values.clubName,
           photoURL: club.photoURL,
         })
@@ -94,20 +95,20 @@ const EditClubScreen = ({ route }) => {
 
   const setupPayments = async () => {
     const response = !club.accountId
-      ? await axios.post(`https://trainee.software/payments/accounts`, {
+      ? await axios.post(`${API_BASE_URL}/payments/accounts`, {
           email: auth.currentUser.email,
           clubId: club.clubId,
           businessName: club.name,
         })
       : await axios.get(
-          `https://trainee.software/payments/accountLinks/${club.accountId}`
+          `${API_BASE_URL}/payments/accountLinks/${club.accountId}`
         );
     Linking.openURL(response.data);
   };
 
   const goToDashboard = async () => {
     const response = await axios.post(
-      `https://trainee.software/payments/dashboard/${club.accountId}`
+      `${API_BASE_URL}/payments/dashboard/${club.accountId}`
     );
     Linking.openURL(response.data);
   };

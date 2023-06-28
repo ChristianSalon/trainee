@@ -15,6 +15,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Team } from "../components/AdminPanel";
 import { RefreshControl } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   route: {
@@ -33,7 +34,7 @@ const AdminPanelTeamsScreen = ({ route }) => {
 
   const getTeams = async () => {
     const response = await axios.get(
-      `https://trainee.software/admin/teams/club/${clubId}/user/${auth.currentUser.uid}`
+      `${API_BASE_URL}/admin/teams/club/${clubId}/user/${auth.currentUser.uid}`
     );
     setTeams(response.data);
   };

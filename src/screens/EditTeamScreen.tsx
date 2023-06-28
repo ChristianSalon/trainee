@@ -19,6 +19,7 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { API_BASE_URL } from "@env";
 
 interface FormValues {
   teamName: string;
@@ -34,7 +35,7 @@ const EditTeamScreen = ({ route }) => {
   useEffect(() => {
     const getClubs = async () => {
       const results = await axios.get(
-        `https://trainee.software/admin/clubs/${signedInUser.uid}`
+        `${API_BASE_URL}/admin/clubs/${signedInUser.uid}`
       );
       setClubs(results.data);
     };
@@ -64,7 +65,7 @@ const EditTeamScreen = ({ route }) => {
 
       ref.getDownloadURL().then((url) => {
         axios
-          .put(`https://trainee.software/admin/teams/${team.teamId}`, {
+          .put(`${API_BASE_URL}/admin/teams/${team.teamId}`, {
             name: values.teamName,
             photoURL: url,
           })
@@ -81,7 +82,7 @@ const EditTeamScreen = ({ route }) => {
       });
     } else {
       axios
-        .put(`https://trainee.software/admin/teams/${team.teamId}`, {
+        .put(`${API_BASE_URL}/admin/teams/${team.teamId}`, {
           name: values.teamName,
           photoURL: team.photoURL,
         })

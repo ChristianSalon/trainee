@@ -14,6 +14,7 @@ import { useTeam } from "../hooks";
 import { Roles, TeamProps } from "../types";
 import axios from "axios";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 const Team: React.FC<TeamProps> = ({ team }) => {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ const Team: React.FC<TeamProps> = ({ team }) => {
       clubId: team.clubId,
     });
     const results = await axios.get(
-      `https://trainee.software/roles/team/${team.teamId}/user/${auth.currentUser.uid}`
+      `${API_BASE_URL}/roles/team/${team.teamId}/user/${auth.currentUser.uid}`
     );
     setRoles(results.data);
     navigation.navigate("Team", { team });

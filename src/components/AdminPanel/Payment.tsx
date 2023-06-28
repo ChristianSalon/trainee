@@ -19,6 +19,7 @@ import axios from "axios";
 import { DeleteModal } from "..";
 import { useClub } from "../../hooks";
 import { auth } from "../../firebase";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   payment: PaymentProps;
@@ -39,10 +40,10 @@ const Payment: React.FC<Props> = ({ payment, onEdit, onDelete }) => {
 
   const deletePayment = async () => {
     const response = await axios.delete(
-      `https://trainee.software/admin/payments/${payment.paymentId}`
+      `${API_BASE_URL}/admin/payments/${payment.paymentId}`
     );
     if (response.status === 200) {
-      axios.post(`https://trainee.software/notifications/clubs`, {
+      axios.post(`${API_BASE_URL}/notifications/clubs`, {
         clubId: club.clubId,
         userId: auth.currentUser.uid,
         title: club.name,

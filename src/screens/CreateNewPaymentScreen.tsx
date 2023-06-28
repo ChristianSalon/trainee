@@ -30,6 +30,7 @@ import { SelectModalInputProps } from "../types";
 import { useClub } from "../hooks";
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 interface formValues {
   name: string;
@@ -60,7 +61,7 @@ const CreateNewPaymentScreen = ({ route }: Props) => {
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `https://trainee.software/teams/club/${club.clubId}`
+        `${API_BASE_URL}/teams/club/${club.clubId}`
       );
       let data: SelectModalInputProps[] = [];
       results.data.forEach((team) => {
@@ -76,19 +77,16 @@ const CreateNewPaymentScreen = ({ route }: Props) => {
   }, []);
 
   const createPayment = async (values: formValues) => {
-    const response = await axios.post(
-      `https://trainee.software/admin/payments`,
-      {
-        teamIds: values.teams.join(","),
-        name: values.name,
-        details: values.details,
-        amount: Number(values.amount),
-        createdAt: timestamp.toISOString().split("T")[0],
-        dueDate: dueDate.toISOString().split("T")[0],
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/admin/payments`, {
+      teamIds: values.teams.join(","),
+      name: values.name,
+      details: values.details,
+      amount: Number(values.amount),
+      createdAt: timestamp.toISOString().split("T")[0],
+      dueDate: dueDate.toISOString().split("T")[0],
+    });
     if (response.status === 200) {
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: values.teams,
         userId: auth.currentUser.uid,
         title: club.name,

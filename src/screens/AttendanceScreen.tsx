@@ -6,6 +6,7 @@ import { Attendance, StatusBar } from "../components";
 import axios from "axios";
 import { RefreshControl } from "react-native";
 import { useTeam } from "../hooks";
+import { API_BASE_URL } from "@env";
 
 const AttendanceScreen = ({ route }) => {
   const [attendance, setAttendance] = useState([]);
@@ -14,18 +15,14 @@ const AttendanceScreen = ({ route }) => {
 
   const getAttendance = async () => {
     setRefreshing(true);
-    const results = await axios.get(
-      `https://trainee.software/attendance/${eventId}`
-    );
+    const results = await axios.get(`${API_BASE_URL}/attendance/${eventId}`);
     setAttendance(results.data);
     setRefreshing(false);
   };
 
   useEffect(() => {
     const getAttendance = async () => {
-      const results = await axios.get(
-        `https://trainee.software/attendance/${eventId}`
-      );
+      const results = await axios.get(`${API_BASE_URL}/attendance/${eventId}`);
       setAttendance(results.data);
     };
     getAttendance();

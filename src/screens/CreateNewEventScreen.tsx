@@ -24,6 +24,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { DateTimePicker, SelectModalInput } from "../components";
 import { SelectModalInputProps } from "../types";
+import { API_BASE_URL } from "@env";
 
 interface FormValues {
   name: string;
@@ -49,7 +50,7 @@ const CreateNewEventScreen = ({ navigation }) => {
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `https://trainee.software/teams/club/${team.clubId}`
+        `${API_BASE_URL}/teams/club/${team.clubId}`
       );
       let data: SelectModalInputProps[] = [];
       results.data.forEach((team) => {
@@ -68,7 +69,7 @@ const CreateNewEventScreen = ({ navigation }) => {
     const docRef = db.collection("events").doc();
     const startTime = startDate.toLocaleTimeString().slice(0, 5);
     const endTime = endDate.toLocaleTimeString().slice(0, 5);
-    const response = await axios.post(`https://trainee.software/events`, {
+    const response = await axios.post(`${API_BASE_URL}/events`, {
       teams: values.teams,
       eventId: docRef.id,
       name: values.name,
@@ -81,7 +82,7 @@ const CreateNewEventScreen = ({ navigation }) => {
       endDate: endDate.toISOString().replace("Z", ""),
     });
     if (response.status === 200) {
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: values.teams,
         userId: auth.currentUser.uid,
         title: team.name,

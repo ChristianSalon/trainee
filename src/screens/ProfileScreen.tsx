@@ -30,6 +30,7 @@ import { colorModeManager } from "../colorModeManager";
 import { useTheme } from "../hooks";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@env";
 
 const ProfileScreen = ({ navigation }) => {
   const signedInUser = auth.currentUser;
@@ -52,7 +53,7 @@ const ProfileScreen = ({ navigation }) => {
         `@notification-token-${signedInUser.uid}`
       );
       axios.delete(
-        `https://trainee.software/notifications/user/${signedInUser.uid}/token/${token}`
+        `${API_BASE_URL}/notifications/user/${signedInUser.uid}/token/${token}`
       );
     });
   };
@@ -94,7 +95,7 @@ const ProfileScreen = ({ navigation }) => {
 
     ref.getDownloadURL().then(async (url) => {
       const response = await axios.put(
-        `https://trainee.software/users/editPhoto/${auth.currentUser.uid}`,
+        `${API_BASE_URL}/users/editPhoto/${auth.currentUser.uid}`,
         {
           photoURL: url,
         }

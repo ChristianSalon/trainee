@@ -17,6 +17,7 @@ import { storage, db, auth } from "../firebase";
 import axios from "axios";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { API_BASE_URL } from "@env";
 
 interface FormValues {
   clubName: string;
@@ -48,14 +49,11 @@ const CreateNewClubScreen = ({ navigation }) => {
     blob.close();
 
     ref.getDownloadURL().then(async (url) => {
-      await axios.post(
-        `https://trainee.software/admin/clubs/${signedInUser.uid}`,
-        {
-          clubId: docRef.id,
-          name: values.clubName,
-          photoURL: url,
-        }
-      );
+      await axios.post(`${API_BASE_URL}/admin/clubs/${signedInUser.uid}`, {
+        clubId: docRef.id,
+        name: values.clubName,
+        photoURL: url,
+      });
       docRef.set({
         id: docRef.id,
         name: values.clubName,
@@ -64,7 +62,7 @@ const CreateNewClubScreen = ({ navigation }) => {
         coaches: [],
         members: [],
       });
-      await axios.post(`https://trainee.software/payments/accounts`, {
+      await axios.post(`${API_BASE_URL}/payments/accounts`, {
         email: auth.currentUser.email,
         clubId: docRef.id,
         businessName: values.clubName,

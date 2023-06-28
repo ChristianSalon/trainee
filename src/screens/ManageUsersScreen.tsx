@@ -14,6 +14,7 @@ import { theme } from "../themes";
 import { User } from "../components/AdminPanel";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import { API_BASE_URL } from "@env";
 
 const ManageUsersScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const ManageUsersScreen = ({ route }) => {
       setRefreshing(true);
     }
     const results = await axios.get(
-      `https://trainee.software/admin/users/${team.teamId}`
+      `${API_BASE_URL}/admin/users/${team.teamId}`
     );
     setUsers(results.data);
     setRefreshing(false);

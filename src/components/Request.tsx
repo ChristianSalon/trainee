@@ -10,6 +10,7 @@ import {
   VStack,
 } from "native-base";
 import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 interface Props {
   request: {
@@ -30,7 +31,7 @@ const Request: React.FC<Props> = ({ request }) => {
 
   const acceptRequest = () => {
     axios
-      .post(`https://trainee.software/requests/acceptRequest`, {
+      .post(`${API_BASE_URL}/requests/acceptRequest`, {
         requestId: request.id,
         teamId: request.teamId,
         userId: request.userId,

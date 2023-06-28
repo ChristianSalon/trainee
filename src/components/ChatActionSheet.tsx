@@ -9,6 +9,7 @@ import firebase from "firebase";
 import useTeam from "../hooks/useTeam";
 import { Audio } from "expo-av";
 import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 const ChatActionSheet: React.FC<ActionSheetProps> = ({
   isOpen,
@@ -73,7 +74,7 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         width: result.width,
         height: result.height,
       });
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: team.teamId,
         userId: auth.currentUser.uid,
         title: team.name,
@@ -138,7 +139,7 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         type: "VIDEOMESSAGE",
       });
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: team.teamId,
         userId: auth.currentUser.uid,
         title: team.name,
@@ -206,7 +207,7 @@ const ChatActionSheet: React.FC<ActionSheetProps> = ({
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         type: "AUDIOMESSAGE",
       });
-      axios.post(`https://trainee.software/notifications/teams`, {
+      axios.post(`${API_BASE_URL}/notifications/teams`, {
         teamIds: team.teamId,
         userId: auth.currentUser.uid,
         title: team.name,

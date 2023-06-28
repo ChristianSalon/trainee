@@ -20,6 +20,7 @@ import axios from "axios";
 import { useClub } from "../hooks";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { API_BASE_URL } from "@env";
 
 interface FormValues {
   teamName: string;
@@ -53,7 +54,7 @@ const CreateNewTeamScreen = ({ navigation }) => {
 
     ref.getDownloadURL().then((url) => {
       axios
-        .post(`https://trainee.software/admin/teams/${signedInUser.uid}`, {
+        .post(`${API_BASE_URL}/admin/teams/${signedInUser.uid}`, {
           teamId: docRef.id,
           clubId: club.clubId,
           name: values.teamName,

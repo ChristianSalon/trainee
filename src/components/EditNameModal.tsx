@@ -13,13 +13,14 @@ import {
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 const EditNameModal = ({ showModal, setShowModal }) => {
   const [name, setName] = useState(auth.currentUser.displayName);
 
   const saveName = async () => {
     const response = await axios.put(
-      `https://trainee.software/users/editName/${auth.currentUser.uid}`,
+      `${API_BASE_URL}/users/editName/${auth.currentUser.uid}`,
       { name: name }
     );
     auth.currentUser

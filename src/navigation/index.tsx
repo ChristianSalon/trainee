@@ -64,6 +64,7 @@ import { ThemeProvider } from "../hooks/useTheme";
 import { useTheme } from "../hooks";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@env";
 
 const greenTopbar = {
   headerStyle: { backgroundColor: "#139874" },
@@ -217,13 +218,10 @@ function MainStackScreen() {
       if (!value) {
         registerForPushNotificationsAsync().then(async (token) => {
           if (token) {
-            const response = await axios.post(
-              `https://trainee.software/notifications`,
-              {
-                userId,
-                token,
-              }
-            );
+            const response = await axios.post(`${API_BASE_URL}/notifications`, {
+              userId,
+              token,
+            });
             AsyncStorage.setItem(`@notification-token-${userId}`, token);
           }
         });
@@ -602,7 +600,7 @@ export default function Navigation() {
   return (
     <StripeProvider
       publishableKey="pk_test_51KqHnWBPMHj98s1MrdNH42HuT1IVh2Sx9SYOuEN4C3nmJvVPXxjxl5YZ2wsTMjP1p43MK7Q5FL66ePov4RF5XvR600SV0CmyiN"
-      urlScheme="https://trainee.software"
+      urlScheme="${API_BASE_URL}"
     >
       <NavigationContainer linking={linking} theme={navigationContainerTheme}>
         <NativeBaseProvider theme={theme} colorModeManager={colorModeManager}>

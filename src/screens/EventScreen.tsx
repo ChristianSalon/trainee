@@ -23,6 +23,7 @@ import firebase from "firebase";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { StatusBar, TextInputModal } from "../components";
+import { API_BASE_URL } from "@env";
 
 const EventScreen = ({ route }) => {
   const { event }: EventProps = route.params;
@@ -63,7 +64,7 @@ const EventScreen = ({ route }) => {
     const getAttendance = async () => {
       console.log("ALL");
       const results = await axios.get(
-        `https://trainee.software/attendance/${event.eventId}`
+        `${API_BASE_URL}/attendance/${event.eventId}`
       );
       results.data.forEach((a) => {
         if (a.userId === auth.currentUser.uid) {
@@ -103,20 +104,17 @@ const EventScreen = ({ route }) => {
     const dateString = new Date().toISOString().split(".")[0];
 
     if (answered && isComingParameter) {
-      await axios.put(
-        `https://trainee.software/attendance/${myAttendance.id}`,
-        {
-          isComing: isComingParameter,
-          date: dateString,
-          excuseNote: null,
-        }
-      );
+      await axios.put(`${API_BASE_URL}/attendance/${myAttendance.id}`, {
+        isComing: isComingParameter,
+        date: dateString,
+        excuseNote: null,
+      });
       setIsComing(isComingParameter);
       setAnswered(true);
     } else if (answered && !isComingParameter) {
       setShowModal(true);
     } else if (isComingParameter) {
-      const resopnse = await axios.post(`https://trainee.software/attendance`, {
+      const resopnse = await axios.post(`${API_BASE_URL}/attendance`, {
         userId: signedInUser.uid,
         eventId: event.eventId,
         isComing: isComingParameter,
@@ -135,16 +133,13 @@ const EventScreen = ({ route }) => {
     const dateString = new Date().toISOString().split(".")[0];
 
     if (answered) {
-      await axios.put(
-        `https://trainee.software/attendance/${myAttendance.id}`,
-        {
-          isComing: false,
-          date: dateString,
-          excuseNote: excuseNote,
-        }
-      );
+      await axios.put(`${API_BASE_URL}/attendance/${myAttendance.id}`, {
+        isComing: false,
+        date: dateString,
+        excuseNote: excuseNote,
+      });
     } else {
-      await axios.post(`https://trainee.software/attendance`, {
+      await axios.post(`${API_BASE_URL}/attendance`, {
         userId: signedInUser.uid,
         eventId: event.eventId,
         isComing: false,

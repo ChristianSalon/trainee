@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Payment, SelectModalInputProps } from "../types";
 import { useClub } from "../hooks";
 import { auth } from "../firebase";
+import { API_BASE_URL } from "@env";
 
 interface formValues {
   name: string;
@@ -46,7 +47,7 @@ const EditPaymentScreen = ({ route }) => {
   useEffect(() => {
     const getTeams = async () => {
       const results = await axios.get(
-        `https://trainee.software/teams/club/${club.clubId}`
+        `${API_BASE_URL}/teams/club/${club.clubId}`
       );
       let data: SelectModalInputProps[] = [];
       results.data.forEach((team) => {
@@ -67,7 +68,7 @@ const EditPaymentScreen = ({ route }) => {
 
   const editPayment = async (values: formValues) => {
     const response = await axios.put(
-      `https://trainee.software/admin/payments/${payment.paymentId}`,
+      `${API_BASE_URL}/admin/payments/${payment.paymentId}`,
       {
         paymentId: payment.paymentId,
         teamIds: values.teams.join(","),
@@ -79,7 +80,7 @@ const EditPaymentScreen = ({ route }) => {
       }
     );
     if (response.status === 200) {
-      axios.post(`https://trainee.software/notifications/clubs`, {
+      axios.post(`${API_BASE_URL}/notifications/clubs`, {
         clubId: club.clubId,
         userId: auth.currentUser.uid,
         title: club.name,

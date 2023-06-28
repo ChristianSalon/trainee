@@ -26,6 +26,7 @@ import { RefreshControl, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@env";
 
 const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 
   const getTeams = async () => {
     const results = await axios.get(
-      `https://trainee.software/teams/${auth.currentUser.uid}`
+      `${API_BASE_URL}/teams/${auth.currentUser.uid}`
     );
     setTeams(results.data);
   };
@@ -55,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
         `@notification-token-${auth.currentUser.uid}`
       );
       axios.delete(
-        `https://trainee.software/notifications/user/${auth.currentUser.uid}/token/${token}`
+        `${API_BASE_URL}/notifications/user/${auth.currentUser.uid}/token/${token}`
       );
     });
   };
