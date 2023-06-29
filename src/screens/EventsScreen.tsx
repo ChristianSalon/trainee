@@ -44,10 +44,8 @@ const EventsScreen = () => {
       if (!events[strTime]) {
         events[strTime] = [];
       }
-      console.log(diffDays);
       // empty dates
       /*for (let i = 0; i < diffDays; i++) {
-        console.log(prevDate);
         if (!events[prevDate]) {
           events[prevDate] = [];
         }
@@ -59,7 +57,6 @@ const EventsScreen = () => {
       events[strTime].push(item);
       //prevDate = strTime;
     });
-    console.log(events);
 
     setEvents(events);
     setIsLoaded(true);

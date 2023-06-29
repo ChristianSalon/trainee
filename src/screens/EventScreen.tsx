@@ -37,13 +37,9 @@ const EventScreen = ({ route }) => {
   let profilePhotos: string[] = [];
   const [profilePhotosState, setProfilePhotosState] = useState<string[]>([]);
   let margin = 0;
-  console.log("RENDER" + profilePhotos);
 
   useEffect(() => {
-    console.log("ME");
     if (isComing && margin / 4 <= 10) {
-      console.log("ME PUSH");
-      console.log(profilePhotos);
       //setProfilePhotosState([...profilePhotosState, auth.currentUser.photoURL]);
       setProfilePhotosState((prev) => [...prev, auth.currentUser.photoURL]);
       //profilePhotosState.push(auth.currentUser.photoURL);
@@ -56,13 +52,10 @@ const EventScreen = ({ route }) => {
         })
       );
     }
-
-    console.log("ME END");
   }, [isComing]);
 
   useEffect(() => {
     const getAttendance = async () => {
-      console.log("ALL");
       const results = await axios.get(
         `${API_BASE_URL}/attendance/${event.eventId}`
       );
@@ -88,8 +81,6 @@ const EventScreen = ({ route }) => {
           margin += 4;
         }
       });
-      console.log("ALL END");
-      console.log(profilePhotos);
       setProfilePhotosState(profilePhotos);
     };
     getAttendance();
